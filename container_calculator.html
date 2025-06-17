@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>20' FCL Container Calculator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .blink {
+      animation: blink 1s infinite;
+    }
+  </style>
+</head>
+<body className="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div id="root"></div>
+  <script type="text/babel">
+    // Defining the product data
+    const products = [
+      { name: "BORAX DECAHYDRATE - GRANULAR", weight: 25, mtPerFCL: 21 },
+      { name: "BORAX DECAHYDRATE - GRANULAR", weight: 1000, mtPerFCL: 20 },
+      { name: "BORAX DECAHYDRATE - POWDER", weight: 25, mtPerFCL: 21 },
+      { name: "BORAX DECAHYDRATE - POWDER", weight: 1000, mtPerFCL: 20 },
+      { name: "BORIC ACID - GRANULAR", weight: 25, mtPerFCL: 21 },
+      { name: "BORIC ACID - GRANULAR", weight: 1000, mtPerFCL: 20 },
+      { name: "BORIC ACID - GRANULAR", weight: 1050, mtPerFCL: 21 },
+      { name: "BORIC ACID - GRANULAR", weight: 1200, mtPerFCL: 24 },
+      { name: "BORIC ACID - POWDER", weight: 25, mtPerFCL: 21 },
+      { name: "BORIC ACID - POWDER", weight: 1000, mtPerFCL: 20 },
+      { name: "BORON OXIDE (GLASSY)", weight: 25, mtPerFCL: 21 },
+      { name: "BORON OXIDE (GLASSY)", weight: 1000, mtPerFCL: 20 },
+      { name: "BORON OXIDE (POROUS)", weight: 25, mtPerFCL: 21 },
+      { name: "BORON OXIDE (POROUS)", weight: 500, mtPerFCL: 20 },
+      { name: "ETIBOR-48 BORAX PENTAHYDRATE - GRANULAR", weight: 25, mtPerFCL: 24 },
+      { name: "ETIBOR-48 BORAX PENTAHYDRATE - GRANULAR", weight: 1000, mtPerFCL: 20 },
+      { name: "ETIBOR-48 BORAX PENTAHYDRATE - GRANULAR", weight: 1200, mtPerFCL: 24 },
+      { name: "ETIBOR-48 BORAX PENTAHYDRATE - POWDER", weight: 1000, mtPerFCL: 20 },
+      { name: "ETIBOR-68 ANHYDROUS BORAX - GRANULAR", weight: 25, mtPerFCL: 24 },
+      { name: "ETIBOR-68 ANHYDROUS BORAX - GRANULAR", weight: 1000, mtPerFCL: 20 },
+      { name: "ETIBOR-68 ANHYDROUS BORAX - GRANULAR", weight: 1200, mtPerFCL: 24 },
+      { name: "ETIBOR-68 ANHYDROUS BORAX - POWDER", weight: 1000, mtPerFCL: 20 },
+      { name: "ETIBOR-68 ANHYDROUS BORAX - POWDER", weight: 1200, mtPerFCL: 24 },
+      { name: "ETICOL-43", weight: 1000, mtPerFCL: 20 },
+      { name: "ETICOL-43", weight: 1050, mtPerFCL: 21 },
+      { name: "ETICOL-43", weight: 1200, mtPerFCL: 24 },
+      { name: "ETICOL-CERAMIC", weight: 1200, mtPerFCL: 24 },
+      { name: "ETIDOT-67", weight: 20, mtPerFCL: 14.4 },
+      { name: "ETIDOT-67", weight: 600, mtPerFCL: 12 },
+      { name: "ETIDOT-67", weight: 900, mtPerFCL: 18 },
+      { name: "ETIFERT-B11", weight: 25, mtPerFCL: 21 },
+      { name: "ETIFERT-B15", weight: 25, mtPerFCL: 24 },
+      { name: "ETIFERT-B17", weight: 25, mtPerFCL: 21 },
+      { name: "ETIFERT-B20", weight: 20, mtPerFCL: 14.4 },
+      { name: "ETI-KBOR", weight: 25, mtPerFCL: 21 },
+      { name: "GROUND COLEMANITE", weight: 1000, mtPerFCL: 20 },
+      { name: "GROUND COLEMANITE", weight: 1200, mtPerFCL: 24 },
+      { name: "GROUND COLEMANITE", weight: 2100, mtPerFCL: 21 },
+      { name: "ULEXITE", weight: 1000, mtPerFCL: 20 },
+      { name: "ZINC BORATE", weight: 800, mtPerFCL: 16 },
+      { name: "ZINC BORATE", weight: 1000, mtPerFCL: 20 }
+    ];
+
+    // Function to format numbers with commas
+    const formatNumber = (num) => {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    // Creating the main React component
+    const ContainerCalculator = () => {
+      const [product, setProduct] = React.useState('');
+      const [weight, setWeight] = React.useState('');
+      const [amount, setAmount] = React.useState('');
+      const [result, setResult] = React.useState(null);
+
+      // Getting unique product names for the first dropdown
+      const uniqueProducts = [...new Set(products.map(p => p.name))];
+
+      // Getting available weights for the selected product
+      const availableWeights = products
+        .filter(p => p.name === product)
+        .map(p => p.weight);
+
+      // Handling product selection
+      const handleProductChange = (e) => {
+        setProduct(e.target.value);
+        setWeight(''); // Reset weight when product changes
+        setResult(null); // Reset result
+      };
+
+      // Handling weight selection
+      const handleWeightChange = (e) => {
+        setWeight(e.target.value);
+        setResult(null); // Reset result
+      };
+
+      // Handling amount input
+      const handleAmountChange = (e) => {
+        setAmount(e.target.value);
+        setResult(null); // Reset result
+      };
+
+      // Calculating containers needed
+      const calculateContainers = (e) => {
+        e.preventDefault();
+        if (!product || !weight || !amount) {
+          setResult('Please select a product, weight, and enter a PO volume.');
+          return;
+        }
+
+        const selectedProduct = products.find(
+          p => p.name === product && p.weight === parseInt(weight)
+        );
+        if (!selectedProduct) {
+          setResult('Invalid product or weight selection.');
+          return;
+        }
+
+        const amountMt = parseFloat(amount);
+        if (isNaN(amountMt) || amountMt <= 0) {
+          setResult('Please enter a valid PO volume in metric tons.');
+          return;
+        }
+
+        const mtPerFCL = selectedProduct.mtPerFCL;
+        const containers = Math.ceil(amountMt / mtPerFCL);
+
+        // Check if the amount is a multiple of mtPerFCL
+        if (amountMt % mtPerFCL !== 0) {
+          setResult({
+            message: `The PO volume has to be in multiples of ${formatNumber(mtPerFCL)} MT, kindly revise your PO volume.`,
+            reference: {
+              product: product,
+              weight: weight,
+              mtPerFCL: mtPerFCL
+            }
+          });
+          return;
+        }
+
+        setResult({
+          message: `You will need <span class="font-bold text-green-600">${formatNumber(containers)}</span> x 20' FCL container(s) for ${formatNumber(amountMt)} MT of ${product} (Weight: ${formatNumber(weight)} kg).`,
+          reference: null
+        });
+      };
+
+      // Rendering the component
+      return (
+        <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+          <div className="flex justify-center mb-4">
+            <img src="https://i.ibb.co/k6QvmW43/Etimaden-For-Life-Logo.jpg" alt="Eti Maden For Life Logo" className="h-16" />
+          </div>
+          <h1 className="text-2xl font-bold mb-4 text-center">20' FCL Container Calculator</h1>
+          
+          {/* Product selection dropdown */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Product Name</label>
+            <select
+              value={product}
+              onChange={handleProductChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Product Name</option>
+              {uniqueProducts.map((name, index) => (
+                <option key={index} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Weight selection dropdown */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Packaging Weight (kg)</label>
+            <select
+              value={weight}
+              onChange={handleWeightChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={!product}
+            >
+              <option value="">Select Weight</option>
+              {availableWeights.map((w, index) => (
+                <option key={index} value={w}>{formatNumber(w)}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* PO volume input */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">PO Volume (MT)</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={handleAmountChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter PO volume in metric tons"
+              min="0"
+              step="0.1"
+            />
+          </div>
+
+          {/* Calculate button */}
+          <button
+            onClick={calculateContainers}
+            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Calculate
+          </button>
+
+          {/* Result display */}
+          {result && (
+            <div className="mt-4 p-4 bg-gray-100 rounded-md">
+              <p className={`text-center text-gray-800 ${result.reference ? 'font-bold text-red-600 blink' : ''}`} dangerouslySetInnerHTML={{ __html: result.message }}></p>
+              {result.reference && (
+                <div className="mt-2 text-sm text-gray-600">
+                  <p><strong>Reference:</strong></p>
+                  <p>Product: {result.reference.product}</p>
+                  <p>Packaging Weight: {formatNumber(result.reference.weight)} kg</p>
+                  <p>MT per 20' FCL: {formatNumber(result.reference.mtPerFCL)} MT</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Rendering the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<ContainerCalculator />);
+  </script>
+</body>
+</html>
