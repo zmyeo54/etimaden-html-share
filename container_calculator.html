@@ -66,9 +66,14 @@
       { name: "ZINC BORATE", weight: 1000, mtPerFCL: 20 }
     ];
 
-    // Function to format numbers with commas
-    const formatNumber = (num) => {
-      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    // Function to format numbers with commas and fixed decimals
+    const formatNumber = (num, decimals = 0) => {
+      return Number(num).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    // Check if a number is a multiple of another with epsilon for floating-point precision
+    const isMultiple = (value, multiple, epsilon = 0.0001) => {
+      return Math.abs(value / multiple - Math.round(value / multiple)) < epsilon;
     };
 
     // Creating the main React component
@@ -89,27 +94,49 @@
       // Handling product selection
       const handleProductChange = (e) => {
         setProduct(e.target.value);
-        setWeight(''); // Reset weight when product changes
-        setResult(null); // Reset result
+        setWeight('');
+        setResult(null);
       };
 
       // Handling weight selection
       const handleWeightChange = (e) => {
         setWeight(e.target.value);
-        setResult(null); // Reset result
+        setResult(null);
       };
 
       // Handling amount input
       const handleAmountChange = (e) => {
-        setAmount(e.target.value);
-        setResult(null); // Reset result
+        const value = e.target.value;
+        // Allow only valid numbers with up to 3 decimal places
+        if (value === '' || /^\d*\.?\d{0,3}$/.test(value)) {
+          setAmount(value);
+          setResult(null);
+        }
+      };
+
+      // Reset all inputs and results
+      const handleReset = () => {
+        setProduct('');
+        setWeight('');
+        setAmount('');
+        setResult(null);
       };
 
       // Calculating containers needed
       const calculateContainers = (e) => {
         e.preventDefault();
-        if (!product || !weight || !amount) {
-          setResult('Please select a product, weight, and enter a PO volume.');
+
+        // Validate inputs
+        if (!product) {
+          setResult('Please select a product.');
+          return;
+        }
+        if (!weight) {
+          setResult('Please select a packaging weight.');
+          return;
+        }
+        if (!amount) {
+          setResult('Please enter a PO volume.');
           return;
         }
 
@@ -123,28 +150,39 @@
 
         const amountMt = parseFloat(amount);
         if (isNaN(amountMt) || amountMt <= 0) {
-          setResult('Please enter a valid PO volume in metric tons.');
+          setResult('PO volume must be a positive number.');
+          return;
+        }
+        if (amountMt > 1000000) {
+          setResult('PO volume is too large. Please enter a value up to 1,000,000 MT.');
           return;
         }
 
         const mtPerFCL = selectedProduct.mtPerFCL;
-        const containers = Math.ceil(amountMt / mtPerFCL);
+        // Format numbers once for efficiency
+        const formattedAmount = formatNumber(amountMt, amountMt % 1 === 0 ? 0 : 2);
+        const formattedWeight = formatNumber(weight);
+        const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCL % 1 === 0 ? 0 : 1);
 
-        // Check if the amount is a multiple of mtPerFCL
-        if (amountMt % mtPerFCL !== 0) {
+        // Check if amount is a multiple of mtPerFCL
+        if (!isMultiple(amountMt, mtPerFCL)) {
           setResult({
-            message: `The PO volume has to be in multiples of ${formatNumber(mtPerFCL)} MT, kindly revise your PO volume.`,
+            message: `The PO volume has to be in multiples of ${formattedMtPerFCL} MT, kindly revise your PO volume.`,
             reference: {
-              product: product,
-              weight: weight,
-              mtPerFCL: mtPerFCL
+              product,
+              weight,
+              mtPerFCL
             }
           });
           return;
         }
 
+        // Calculate exact containers since amount is a multiple
+        const containers = amountMt / mtPerFCL;
+        const formattedContainers = formatNumber(containers, 0);
+
         setResult({
-          message: `You will need <span class="font-bold text-green-600">${formatNumber(containers)}</span> x 20' FCL container(s) for ${formatNumber(amountMt)} MT of ${product} (Weight: ${formatNumber(weight)} kg).`,
+          message: `You will need <span class="font-bold text-green-600">${formattedContainers}</span> x 20' FCL container(s) for ${formattedAmount} MT of ${product} (Weight: ${formattedWeight} kg).`,
           reference: null
         });
       };
@@ -202,13 +240,21 @@
             />
           </div>
 
-          {/* Calculate button */}
-          <button
-            onClick={calculateContainers}
-            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Calculate
-          </button>
+          {/* Buttons */}
+          <div className="flex space-x-2">
+            <button
+              onClick={calculateContainers}
+              className="flex-1 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Calculate
+            </button>
+            <button
+              onClick={handleReset}
+              className="flex-1 bg-gray-500 text-white p-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            >
+              Reset
+            </button>
+          </div>
 
           {/* Result display */}
           {result && (
@@ -219,7 +265,7 @@
                   <p><strong>Reference:</strong></p>
                   <p>Product: {result.reference.product}</p>
                   <p>Packaging Weight: {formatNumber(result.reference.weight)} kg</p>
-                  <p>MT per 20' FCL: {formatNumber(result.reference.mtPerFCL)} MT</p>
+                  <p>MT per 20' FCL: {formatNumber(result.reference.mtPerFCL, result.reference.mtPerFCL % 1 === 0 ? 0 : 1)} MT</p>
                 </div>
               )}
             </div>
