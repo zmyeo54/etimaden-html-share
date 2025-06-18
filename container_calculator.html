@@ -55,6 +55,7 @@
       { name: "ETIDOT-67", weight: 900, mtPerFCL: 18 },
       { name: "ETIFERT-B11", weight: 25, mtPerFCL: 21 },
       { name: "ETIFERT-B15", weight: 25, mtPerFCL: 24 },
+      { name: "ETIFERT-B15", weight: 1200, mtPerFCL: 24.0 },
       { name: "ETIFERT-B17", weight: 25, mtPerFCL: 21 },
       { name: "ETIFERT-B20", weight: 20, mtPerFCL: 14.4 },
       { name: "ETI-KBOR", weight: 25, mtPerFCL: 21 },
@@ -101,6 +102,9 @@
       const [weight, setWeight] = React.useState('');
       const [amount, setAmount] = React.useState('');
       const [result, setResult] = React.useState(null);
+      const [productError, setProductError] = React.useState('');
+      const [weightError, setWeightError] = React.useState('');
+      const [amountError, setAmountError] = React.useState('');
 
       // Getting unique product names for the first dropdown
       const uniqueProducts = [...new Set(products.map(p => p.name))];
@@ -117,6 +121,9 @@
         setWeight('');
         setAmount('');
         setResult(null);
+        setProductError('');
+        setWeightError('');
+        setAmountError('');
       };
 
       // Handling weight selection
@@ -124,14 +131,36 @@
         setWeight(e.target.value);
         setAmount('');
         setResult(null);
+        setWeightError('');
+        setAmountError('');
       };
 
       // Handling amount input
       const handleAmountChange = (e) => {
         const value = e.target.value;
-        if (value === "" || /^\d*\.?\d{0,5}$/.test(value)) {
+        // Allow empty input, digits, one decimal point, and up to one digit after decimal
+        if (value === "" || /^\d*\.?\d{0,1}$/.test(value)) {
           setAmount(value);
           setResult(null);
+          setAmountError('');
+        }
+      };
+
+      // Format amount to one decimal place on blur
+      const handleAmountBlur = () => {
+        if (amount) {
+          const formatted = parseFloat(amount).toFixed(1);
+          if (!isNaN(formatted)) {
+            setAmount(formatted);
+            setAmountError('');
+          }
+        }
+      };
+
+      // Prevent 'e', 'E', '+', '-', and other invalid characters
+      const handleKeyDown = (e) => {
+        if (['e', 'E', '+', '-'].includes(e.key)) {
+          e.preventDefault();
         }
       };
 
@@ -141,23 +170,51 @@
         setWeight('');
         setAmount('');
         setResult(null);
+        setProductError('');
+        setWeightError('');
+        setAmountError('');
       };
 
       // Calculating containers needed
       const calculateContainers = (e) => {
         e.preventDefault();
 
+        let hasError = false;
+
         if (!product) {
-          setResult("Please select a product.");
-          return;
+          setProductError("Please select a product name.");
+          hasError = true;
+        } else {
+          setProductError('');
         }
+
         if (!weight) {
-          setResult("Please select a packaging weight.");
-          return;
+          setWeightError("Please select a packaging weight.");
+          hasError = true;
+        } else {
+          setWeightError('');
         }
+
         if (!amount) {
           setResult("Please enter a PO volume.");
+          hasError = true;
+        }
+
+        if (hasError) {
           return;
+        }
+
+        const amountMt = parseFloat(amount);
+        if (isNaN(amountMt) || amountMt <= 0) {
+          setResult("PO volume must be a positive number.");
+          return;
+        }
+        if (amountMt > 10000.0) {
+          setAmountError("PO volume is too large. Please enter a value up to 10,000.0 MT.");
+          setResult("PO volume is too large. Please enter a value up to 10,000.0 MT.");
+          return;
+        } else {
+          setAmountError('');
         }
 
         const selectedProduct = products.find(
@@ -168,18 +225,8 @@
           return;
         }
 
-        const amountMt = parseFloat(amount);
-        if (isNaN(amountMt) || amountMt <= 0) {
-          setResult("PO volume must be a positive number.");
-          return;
-        }
-        if (amountMt > 1000000) {
-          setResult("PO volume is too large. Please enter a value up to 1,000,000 MT.");
-          return;
-        }
-
         const mtPerFCL = selectedProduct.mtPerFCL;
-        const amountDecimals = amount.includes('.') ? amount.split('.')[1].length : 0;
+        const amountDecimals = 1; // Always 1 decimal for input
         const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
         const formattedAmount = formatNumber(amountMt, amountDecimals);
         const formattedWeight = formatNumber(weight, 0);
@@ -228,6 +275,9 @@
                 <option key={index} value={name}>{name}</option>
               ))}
             </select>
+            {productError && (
+              <p className="mt-1 text-xs text-red-600">{productError}</p>
+            )}
           </div>
 
           {/* Weight selection dropdown */}
@@ -244,20 +294,27 @@
                 <option key={index} value={w}>{formatNumber(w, 0)}</option>
               ))}
             </select>
+            {weightError && (
+              <p className="mt-1 text-xs text-red-600">{weightError}</p>
+            )}
           </div>
 
           {/* PO Volume input */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">PO Volume (MT)</label>
             <input
-              type="number"
+              type="text"
               value={amount}
               onChange={handleAmountChange}
+              onBlur={handleAmountBlur}
+              onKeyDown={handleKeyDown}
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter PO volume in MT"
+              placeholder="Enter PO volume in MT (e.g., 21.0)"
               min="0"
-              step="0.001"
             />
+            {amountError && (
+              <p className="mt-1 text-xs text-red-600">{amountError}</p>
+            )}
           </div>
 
           {/* Buttons */}
@@ -285,7 +342,7 @@
                   <p><strong>Reference:</strong></p>
                   <p>Product: {result.reference.product}</p>
                   <p>Weight: {formatNumber(result.reference.weight, 0)} kg</p>
-                  <p>MT per FCL: {formatNumber(result.reference.mtPerFCL, result.reference.mtPerFCL % 1 === 0 ? 0 : String(result.reference.mtPerFCL).split('.')[1].length)} MT</p>
+                  <p>MT per 20' FCL: {formatNumber(result.reference.mtPerFCL, result.reference.mtPerFCL % 1 === 0 ? 0 : String(result.reference.mtPerFCL).split('.')[1].length)} MT</p>
                 </div>
               )}
             </div>
