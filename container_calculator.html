@@ -83,6 +83,18 @@
       return scaledValue % scaledMultiple === 0;
     };
 
+    // Function to suggest nearest valid multiples
+    const suggestMultiples = (amountMt, mtPerFCL) => {
+      let lowerMultiple = Math.floor(amountMt / mtPerFCL) * mtPerFCL;
+      if (lowerMultiple === 0) lowerMultiple = mtPerFCL; // Avoid suggesting 0
+      const higherMultiple = lowerMultiple + mtPerFCL;
+      const decimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
+      return {
+        lower: formatNumber(lowerMultiple, decimals),
+        higher: formatNumber(higherMultiple, decimals)
+      };
+    };
+
     // Creating the main React component
     const ContainerCalculator = () => {
       const [product, setProduct] = React.useState('');
@@ -167,7 +179,6 @@
         }
 
         const mtPerFCL = selectedProduct.mtPerFCL;
-        // Determine decimal places for formatting
         const amountDecimals = amount.includes('.') ? amount.split('.')[1].length : 0;
         const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
         const formattedAmount = formatNumber(amountMt, amountDecimals);
@@ -175,8 +186,9 @@
         const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCLDecimals);
 
         if (!isMultiple(amountMt, mtPerFCL)) {
+          const { lower, higher } = suggestMultiples(amountMt, mtPerFCL);
           setResult({
-            message: `The PO volume must be in multiples of ${formattedMtPerFCL} MT. Please revise your PO volume.`,
+            message: `The PO volume must be in multiples of ${formattedMtPerFCL} MT. Please revise your PO volume.<br><br><span class="text-blue-800">Suggested values: ${lower} MT or ${higher} MT.</span>`,
             reference: {
               product,
               weight,
@@ -198,7 +210,7 @@
       // Rendering the container
       return (
         <div className="max-w-md mx-auto bg-white p-6 rounded-md shadow-lg">
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center" style={{ marginBottom: '5px' }}>
             <img src="https://i.postimg.cc/ZYH2zSww/Etimaden-For-Life-Logo.jpg" alt="Etimaden Logo" className="h-16" />
           </div>
           <h1 className="text-2xl font-bold mb-6 text-center">20' FCL Container Calculator</h1>
