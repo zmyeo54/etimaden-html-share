@@ -18,7 +18,7 @@
     }
   </style>
 </head>
-<body className="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
   <div id="root"></div>
   <script type="text/babel">
     // Defining the product data
@@ -68,12 +68,15 @@
 
     // Function to format numbers with commas and fixed decimals
     const formatNumber = (num, decimals = 0) => {
-      return Number(num).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      if (isNaN(num)) return "0";
+      const fixed = Number(num).toFixed(decimals);
+      const [integerPart, decimalPart] = fixed.split('.');
+      const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
     };
 
     // Check if a number is a multiple of another, avoiding floating-point precision issues
     const isMultiple = (value, multiple) => {
-      // Scale by 1000 to convert decimals to integers (e.g., 14.4 -> 14400)
       const scale = 1000;
       const scaledValue = Math.round(value * scale);
       const scaledMultiple = Math.round(multiple * scale);
@@ -93,25 +96,27 @@
       // Getting available weights for the selected product
       const availableWeights = products
         .filter(p => p.name === product)
-        .map(p => p.weight);
+        .map(p => p.weight)
+        .sort((a, b) => a - b);
 
       // Handling product selection
       const handleProductChange = (e) => {
         setProduct(e.target.value);
         setWeight('');
+        setAmount('');
         setResult(null);
       };
 
       // Handling weight selection
       const handleWeightChange = (e) => {
         setWeight(e.target.value);
+        setAmount('');
         setResult(null);
       };
 
       // Handling amount input
       const handleAmountChange = (e) => {
         const value = e.target.value;
-        // Allow only valid numbers with up to 5 decimal places
         if (value === "" || /^\d*\.?\d{0,5}$/.test(value)) {
           setAmount(value);
           setResult(null);
@@ -130,7 +135,6 @@
       const calculateContainers = (e) => {
         e.preventDefault();
 
-        // Validate inputs
         if (!product) {
           setResult("Please select a product.");
           return;
@@ -163,15 +167,16 @@
         }
 
         const mtPerFCL = selectedProduct.mtPerFCL;
-        // Format numbers once for efficiency
-        const formattedAmount = formatNumber(amountMt, amountMt % 1 === 0 ? 0 : 5);
-        const formattedWeight = formatNumber(weight);
-        const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCL % 1 === 0 ? 0 : 5);
+        // Determine decimal places for formatting
+        const amountDecimals = amount.includes('.') ? amount.split('.')[1].length : 0;
+        const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
+        const formattedAmount = formatNumber(amountMt, amountDecimals);
+        const formattedWeight = formatNumber(weight, 0);
+        const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCLDecimals);
 
-        // Check if amount is a multiple of mt riparian point
         if (!isMultiple(amountMt, mtPerFCL)) {
           setResult({
-            message: `The PO volume must be in multiples of ${formattedMtPerFCL} MT, kindly revise your PO volume.`,
+            message: `The PO volume must be in multiples of ${formattedMtPerFCL} MT. Please revise your PO volume.`,
             reference: {
               product,
               weight,
@@ -181,7 +186,6 @@
           return;
         }
 
-        // Calculate exact containers since amount is a multiple
         const containers = amountMt / mtPerFCL;
         const formattedContainers = formatNumber(containers, 0);
 
@@ -195,7 +199,7 @@
       return (
         <div className="max-w-md mx-auto bg-white p-6 rounded-md shadow-lg">
           <div className="flex justify-center mb-6">
-            <img src="https://i.postimg.cc/ZYH2zSww/Etimaden-For-Life-Logo.jpg" alt="KTMLN Logo" className="h-16" />
+            <img src="https://i.postimg.cc/ZYH2zSww/Etimaden-For-Life-Logo.jpg" alt="Etimaden Logo" className="h-16" />
           </div>
           <h1 className="text-2xl font-bold mb-6 text-center">20' FCL Container Calculator</h1>
           
@@ -225,7 +229,7 @@
             >
               <option value="">Select Weight</option>
               {availableWeights.map((w, index) => (
-                <option key={index} value={pw}>{formatNumber(pw)}</option>
+                <option key={index} value={w}>{formatNumber(w, 0)}</option>
               ))}
             </select>
           </div>
@@ -268,8 +272,8 @@
                 <div className="mt-2 text-xs text-gray-600">
                   <p><strong>Reference:</strong></p>
                   <p>Product: {result.reference.product}</p>
-                  <p>Weight: {formatNumber(result.reference.weight)} kg</p>
-                  <p>MT per FCL: {formatNumber(result.reference.mtPerFCL, result.reference.mtPerFCL % 1 === 0 ? 0 : 5)} MT</p>
+                  <p>Weight: {formatNumber(result.reference.weight, 0)} kg</p>
+                  <p>MT per FCL: {formatNumber(result.reference.mtPerFCL, result.reference.mtPerFCL % 1 === 0 ? 0 : String(result.reference.mtPerFCL).split('.')[1].length)} MT</p>
                 </div>
               )}
             </div>
