@@ -8,7 +8,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    body {
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    }
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.3; }
@@ -16,9 +20,76 @@
     .blink {
       animation: blink 1s infinite;
     }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .logo-animate {
+      animation: fadeIn 1s ease-in;
+    }
+    .tooltip {
+      position: relative;
+    }
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: #1E3A8A;
+      color: white;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 12px;
+    }
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    .autocomplete-suggestions {
+      position: absolute;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      z-index: 20;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .autocomplete-suggestion {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .autocomplete-suggestion:hover {
+      background-color: #f3f4f6;
+    }
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem;
+      }
+      label {
+        font-size: 14px;
+      }
+      input, select, button {
+        font-size: 14px;
+        padding: 0.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .result-text {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="bg-gray-200 min-h-screen flex items-center justify-center">
   <div id="root"></div>
   <script type="text/babel">
     // Defining the product data
@@ -67,6 +138,202 @@
       { name: "ZINC BORATE", weight: 1000, mtPerFCL: 20 }
     ];
 
+    // Translation object
+    const translations = {
+      en: {
+        title: "20' FCL Container Calculator",
+        welcome: "Welcome to Etimaden's 20' FCL Container Calculator",
+        welcomeText: "Effortlessly determine the number of 20-foot containers required for your shipment. Select a product, choose a packaging weight, and input your PO volume in metric tons to begin.",
+        getStarted: "Get Started",
+        searchProduct: "Search Product",
+        searchPlaceholder: "Type to search products...",
+        clearSearch: "Clear search",
+        productName: "Product Name",
+        selectProduct: "Select Product Name",
+        productError: "Please select a product name.",
+        packagingWeight: "Packaging Weight (kg)",
+        selectWeight: "Select Weight",
+        weightError: "Please select a packaging weight.",
+        poVolume: "PO Volume (MT)",
+        poPlaceholder: "e.g., 21.0 MT",
+        amountError: "Please enter a PO volume.",
+        amountInvalid: "PO volume must be a positive number.",
+        amountTooLarge: "PO volume is too large. Please enter a value up to 10,000.0 MT.",
+        calculate: "Calculate",
+        calculating: "Calculating...",
+        reset: "Reset",
+        resetConfirm: "Are you sure you want to reset all fields?",
+        invalidSelection: "Invalid product or weight selection.",
+        multipleError: "The PO volume must be in multiples of {mtPerFCL} MT. Please revise your PO volume.",
+        resultMessage: "You will need <span class=\"font-bold text-blue-600\">{containers}</span> x 20' FCL container(s) for {amount} MT of {product} (Weight: {weight} kg).",
+        useLower: "Use {lower} MT",
+        useHigher: "Use {higher} MT",
+        summary: "Summary",
+        product: "Product",
+        weight: "Weight",
+        containers: "Containers",
+        container: "Container",
+        volume: "Volume",
+        copyResult: "Copy Result",
+        copySuccess: "Result copied to clipboard!",
+        copyFailure: "Failed to copy result. Please copy manually.",
+        reference: "Reference",
+        mtPerFCL: "MT per 20' FCL",
+        recentCalculations: "Recent Calculations",
+        clearAll: "Clear All",
+        clearConfirm: "Are you sure you want to clear all recent calculations?",
+        searchTooltip: "Search for a product by typing its name",
+        productTooltip: "Select the product you are shipping",
+        weightTooltip: "Select the packaging weight in kilograms",
+        volumeTooltip: "Enter the purchase order volume in metric tons (e.g., 21.0)",
+        language: "Language"
+      },
+      zh: {
+        title: "20呎貨櫃計算器",
+        welcome: "歡迎使用Etimaden的20呎貨櫃計算器",
+        welcomeText: "輕鬆計算您的貨物所需的20呎貨櫃數量。選擇產品，選取包裝重量，並輸入以公噸計的訂單量以開始。",
+        getStarted: "開始使用",
+        searchProduct: "搜尋產品",
+        searchPlaceholder: "輸入以搜尋產品...",
+        clearSearch: "清除搜尋",
+        productName: "產品名稱",
+        selectProduct: "選擇產品名稱",
+        productError: "請選擇產品名稱。",
+        packagingWeight: "包裝重量（公斤）",
+        selectWeight: "選擇重量",
+        weightError: "請選擇包裝重量。",
+        poVolume: "訂單量（公噸）",
+        poPlaceholder: "例如：21.0 公噸",
+        amountError: "請輸入訂單量。",
+        amountInvalid: "訂單量必須為正數。",
+        amountTooLarge: "訂單量過大。請輸入最多10,000.0公噸的數值。",
+        calculate: "計算",
+        calculating: "計算中...",
+        reset: "重置",
+        resetConfirm: "您確定要重置所有欄位嗎？",
+        invalidSelection: "無效的產品或重量選擇。",
+        multipleError: "訂單量必須為{mtPerFCL}公噸的倍數。請修正您的訂單量。",
+        resultMessage: "您需要<span class=\"font-bold text-blue-600\">{containers}</span>個20呎貨櫃來運送{amount}公噸的{product}（重量：{weight}公斤）。",
+        useLower: "使用{lower}公噸",
+        useHigher: "使用{higher}公噸",
+        summary: "總結",
+        product: "產品",
+        weight: "重量",
+        containers: "貨櫃",
+        container: "貨櫃",
+        volume: "訂單量",
+        copyResult: "複製結果",
+        copySuccess: "結果已複製到剪貼簿！",
+        copyFailure: "無法複製結果。請手動複製。",
+        reference: "參考",
+        mtPerFCL: "每20呎貨櫃公噸數",
+        recentCalculations: "近期計算",
+        clearAll: "全部清除",
+        clearConfirm: "您確定要清除所有近期計算嗎？",
+        searchTooltip: "通過輸入產品名稱進行搜尋",
+        productTooltip: "選擇您要運送的產品",
+        weightTooltip: "選擇以公斤計的包裝重量",
+        volumeTooltip: "輸入以公噸計的訂單量（例如：21.0）",
+        language: "語言"
+      },
+      ms: {
+        title: "Kalkulator Kontena 20' FCL",
+        welcome: "Selamat Datang ke Kalkulator Kontena 20' FCL Etimaden",
+        welcomeText: "Tentukan bilangan kontena 20 kaki yang diperlukan untuk penghantaran anda dengan mudah. Pilih produk, pilih berat pembungkusan, dan masukkan jumlah PO anda dalam tan metrik untuk bermula.",
+        getStarted: "Mulakan",
+        searchProduct: "Cari Produk",
+        searchPlaceholder: "Taip untuk mencari produk...",
+        clearSearch: "Kosongkan carian",
+        productName: "Nama Produk",
+        selectProduct: "Pilih Nama Produk",
+        productError: "Sila pilih nama produk.",
+        packagingWeight: "Berat Pembungkusan (kg)",
+        selectWeight: "Pilih Berat",
+        weightError: "Sila pilih berat pembungkusan.",
+        poVolume: "Jumlah PO (MT)",
+        poPlaceholder: "cth., 21.0 MT",
+        amountError: "Sila masukkan jumlah PO.",
+        amountInvalid: "Jumlah PO mesti nombor positif.",
+        amountTooLarge: "Jumlah PO terlalu besar. Sila masukkan nilai sehingga 10,000.0 MT.",
+        calculate: "Kira",
+        calculating: "Mengira...",
+        reset: "Set Semula",
+        resetConfirm: "Adakah anda pasti mahu menetapkan semula semua medan?",
+        invalidSelection: "Pemilihan produk atau berat tidak sah.",
+        multipleError: "Jumlah PO mesti dalam gandaan {mtPerFCL} MT. Sila semak jumlah PO anda.",
+        resultMessage: "Anda memerlukan <span class=\"font-bold text-blue-600\">{containers}</span> x kontena 20' FCL untuk {amount} MT bagi {product} (Berat: {weight} kg).",
+        useLower: "Guna {lower} MT",
+        useHigher: "Guna {higher} MT",
+        summary: "Ringkasan",
+        product: "Produk",
+        weight: "Berat",
+        containers: "Kontena",
+        container: "Kontena",
+        volume: "Jumlah",
+        copyResult: "Salin Hasil",
+        copySuccess: "Hasil disalin ke papan klip!",
+        copyFailure: "Gagal menyalin hasil. Sila salin secara manual.",
+        reference: "Rujukan",
+        mtPerFCL: "MT setiap 20' FCL",
+        recentCalculations: "Pengiraan Terkini",
+        clearAll: "Kosongkan Semua",
+        clearConfirm: "Adakah anda pasti mahu mengosongkan semua pengiraan terkini?",
+        searchTooltip: "Cari produk dengan menaip namanya",
+        productTooltip: "Pilih produk yang anda hantar",
+        weightTooltip: "Pilih berat pembungkusan dalam kilogram",
+        volumeTooltip: "Masukkan jumlah pesanan pembelian dalam tan metrik (cth., 21.0)",
+        language: "Bahasa"
+      },
+      tr: {
+        title: "20' FCL Konteyner Hesaplayıcı",
+        welcome: "Etimaden'in 20' FCL Konteyner Hesaplayıcısına Hoş Geldiniz",
+        welcomeText: "Göçmenliğiniz için gereken 20 fitlik konteyner sayısını kolayca belirleyin. Bir ürün seçin, ambalaj ağırlığını seçin ve metrik ton cinsinden PO hacminizi girin.",
+        getStarted: "Başlayın",
+        searchProduct: "Ürün Ara",
+        searchPlaceholder: "Ürünleri aramak için yazın...",
+        clearSearch: "Aramayı temizle",
+        productName: "Ürün Adı",
+        selectProduct: "Ürün Adı Seçin",
+        productError: "Lütfen bir ürün adı seçin.",
+        packagingWeight: "Ambalaj Ağırlığı (kg)",
+        selectWeight: "Ağırlık Seçin",
+        weightError: "Lütfen bir ambalaj ağırlığı seçin.",
+        poVolume: "PO Hacmi (MT)",
+        poPlaceholder: "örn., 21.0 MT",
+        amountError: "Lütfen PO hacmi girin.",
+        amountInvalid: "PO hacmi pozitif bir sayı olmalı.",
+        amountTooLarge: "PO hacmi çok büyük. Lütfen 10,000.0 MT'ye kadar bir değer girin.",
+        calculate: "Hesapla",
+        calculating: "Hesaplanıyor...",
+        reset: "Sıfırla",
+        resetConfirm: "Tüm alanları sıfırlamak istediğinizden emin misiniz?",
+        invalidSelection: "Geçersiz ürün veya ağırlık seçimi.",
+        multipleError: "PO hacmi {mtPerFCL} MT'nin katları olmalı. Lütfen PO hacminizi düzeltin.",
+        resultMessage: "<span class=\"font-bold text-blue-600\">{containers}</span> x 20' FCL konteyner(ler) {amount} MT {product} için gerekli (Ağırlık: {weight} kg).",
+        useLower: "{lower} MT Kullan",
+        useHigher: "{higher} MT Kullan",
+        summary: "Özet",
+        product: "Ürün",
+        weight: "Ağırlık",
+        containers: "Konteynerler",
+        container: "Konteyner",
+        volume: "Hacim",
+        copyResult: "Sonucu Kopyala",
+        copySuccess: "Sonuç panoya kopyalandı!",
+        copyFailure: "Sonuç kopyalanamadı. Lütfen manuel kopyalayın.",
+        reference: "Referans",
+        mtPerFCL: "20' FCL başına MT",
+        recentCalculations: "Son Hesaplamalar",
+        clearAll: "Tümünü Temizle",
+        clearConfirm: "Tüm son hesaplamaları temizlemek istediğinizden emin misiniz?",
+        searchTooltip: "Ürün adını yazarak arayın",
+        productTooltip: "Göçmenlik yaptığınız ürünü seçin",
+        weightTooltip: "Kilogram cinsinden ambalaj ağırlığını seçin",
+        volumeTooltip: "Metrik ton cinsinden satın alma siparişi hacmini girin (örn., 21.0)",
+        language: "Dil"
+      }
+    };
+
     // Function to format numbers with commas and fixed decimals
     const formatNumber = (num, decimals = 0) => {
       if (isNaN(num)) return "0";
@@ -87,13 +354,23 @@
     // Function to suggest nearest valid multiples
     const suggestMultiples = (amountMt, mtPerFCL) => {
       let lowerMultiple = Math.floor(amountMt / mtPerFCL) * mtPerFCL;
-      if (lowerMultiple === 0) lowerMultiple = mtPerFCL; // Avoid suggesting 0
+      if (lowerMultiple === 0) lowerMultiple = mtPerFCL;
       const higherMultiple = lowerMultiple + mtPerFCL;
       const decimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
       return {
         lower: formatNumber(lowerMultiple, decimals),
         higher: formatNumber(higherMultiple, decimals)
       };
+    };
+
+    // Tooltip component
+    const Tooltip = ({ children, text }) => {
+      return (
+        <div className="tooltip inline-block">
+          {children}
+          <span className="tooltip-text">{text}</span>
+        </div>
+      );
     };
 
     // Creating the main React component
@@ -105,15 +382,111 @@
       const [productError, setProductError] = React.useState('');
       const [weightError, setWeightError] = React.useState('');
       const [amountError, setAmountError] = React.useState('');
+      const [isLoading, setIsLoading] = React.useState(false);
+      const [recentCalculations, setRecentCalculations] = React.useState([]);
+      const [showModal, setShowModal] = React.useState(localStorage.getItem('modalDismissed') !== 'true');
+      const [productSearch, setProductSearch] = React.useState('');
+      const [language, setLanguage] = React.useState(localStorage.getItem('language') || 'en');
+      const productInputRef = React.useRef(null);
+      const weightInputRef = React.useRef(null);
+      const amountInputRef = React.useRef(null);
 
-      // Getting unique product names for the first dropdown
+      // Translation function
+      const t = (key, params = {}) => {
+        let text = translations[language][key] || key;
+        Object.keys(params).forEach(param => {
+          text = text.replace(`{${param}}`, params[param]);
+        });
+        return text;
+      };
+
+      // Save language to localStorage
+      React.useEffect(() => {
+        localStorage.setItem('language', language);
+      }, [language]);
+
+      // Handle language change
+      const handleLanguageChange = (e) => {
+        setLanguage(e.target.value);
+      };
+
+      // Getting unique product names for the first dropdown and search
       const uniqueProducts = [...new Set(products.map(p => p.name))];
+      const filteredProducts = uniqueProducts.filter(name =>
+        name.toLowerCase().includes(productSearch.toLowerCase())
+      );
 
       // Getting available weights for the selected product
       const availableWeights = products
         .filter(p => p.name === product)
         .map(p => p.weight)
         .sort((a, b) => a - b);
+
+      // Auto-select first weight when product changes
+      React.useEffect(() => {
+        if (product && availableWeights.length > 0 && !weight) {
+          setWeight(availableWeights[0].toString());
+          weightInputRef.current?.focus();
+        }
+      }, [product, availableWeights]);
+
+      // Focus search input on mount
+      React.useEffect(() => {
+        productInputRef.current?.focus();
+      }, []);
+
+      // Load recent calculations from local storage
+      React.useEffect(() => {
+        const saved = localStorage.getItem('recentCalculations');
+        if (saved) {
+          setRecentCalculations(JSON.parse(saved));
+        }
+      }, []);
+
+      // Handling product search
+      const handleProductSearchChange = (e) => {
+        setProductSearch(e.target.value);
+        setProduct('');
+        setWeight('');
+        setAmount('');
+        setResult(null);
+        setProductError('');
+        setWeightError('');
+        setAmountError('');
+      };
+
+      // Select product from search suggestions
+      const selectProductFromSearch = (name) => {
+        setProduct(name);
+        setProductSearch('');
+        setWeight('');
+        setAmount('');
+        setResult(null);
+        setProductError('');
+        setWeightError('');
+        setAmountError('');
+        weightInputRef.current?.focus();
+      };
+
+      // Handle search input keydown for accessibility
+      const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter' && filteredProducts.length > 0) {
+          selectProductFromSearch(filteredProducts[0]);
+        }
+      };
+
+      // Clear search input
+      const clearSearch = () => {
+        setProductSearch('');
+        setProduct('');
+        setWeight('');
+        setAmount('');
+        setResult(null);
+        setProductError('');
+        setWeightError('');
+        setAmountError('');
+        productInputRef.current?.focus();
+      };
 
       // Handling product selection
       const handleProductChange = (e) => {
@@ -124,6 +497,7 @@
         setProductError('');
         setWeightError('');
         setAmountError('');
+        setProductSearch('');
       };
 
       // Handling weight selection
@@ -133,12 +507,12 @@
         setResult(null);
         setWeightError('');
         setAmountError('');
+        amountInputRef.current?.focus();
       };
 
       // Handling amount input
       const handleAmountChange = (e) => {
         const value = e.target.value;
-        // Allow empty input, digits, one decimal point, and up to one digit after decimal
         if (value === "" || /^\d*\.?\d{0,1}$/.test(value)) {
           setAmount(value);
           setResult(null);
@@ -162,194 +536,512 @@
         if (['e', 'E', '+', '-'].includes(e.key)) {
           e.preventDefault();
         }
+        if (e.key === 'Enter') {
+          calculateContainers(e);
+        }
       };
 
       // Reset all inputs and results
       const handleReset = () => {
-        setProduct('');
-        setWeight('');
-        setAmount('');
-        setResult(null);
-        setProductError('');
-        setWeightError('');
-        setAmountError('');
+        if (window.confirm(t('resetConfirm'))) {
+          setProduct('');
+          setWeight('');
+          setAmount('');
+          setResult(null);
+          setProductError('');
+          setWeightError('');
+          setAmountError('');
+          setProductSearch('');
+          productInputRef.current?.focus();
+        }
       };
 
-      // Calculating containers needed
+      // Clear recent calculations history
+      const clearHistory = () => {
+        if (window.confirm(t('clearConfirm'))) {
+          setRecentCalculations([]);
+          localStorage.removeItem('recentCalculations');
+        }
+      };
+
+      // Helper function to perform calculation
+      const triggerCalculation = (newAmount) => {
+        setIsLoading(true);
+        setTimeout(() => {
+          let hasError = false;
+
+          if (!product) {
+            setProductError(t('productError'));
+            productInputRef.current?.focus();
+            hasError = true;
+          } else {
+            setProductError('');
+          }
+
+          if (!weight) {
+            setWeightError(t('weightError'));
+            weightInputRef.current?.focus();
+            hasError = true;
+          } else {
+            setWeightError('');
+          }
+
+          if (!newAmount) {
+            setAmountError(t('amountError'));
+            amountInputRef.current?.focus();
+            hasError = true;
+          }
+
+          if (hasError) {
+            setIsLoading(false);
+            return;
+          }
+
+          const amountMt = parseFloat(newAmount);
+
+          if (isNaN(amountMt) || amountMt <= 0) {
+            setAmountError(t('amountInvalid'));
+            amountInputRef.current?.focus();
+            setResult(t('amountInvalid'));
+            setIsLoading(false);
+            return;
+          }
+          if (amountMt > 10000.0) {
+            setAmountError(t('amountTooLarge'));
+            amountInputRef.current?.focus();
+            setResult(t('amountTooLarge'));
+            setIsLoading(false);
+            return;
+          } else {
+            setAmountError('');
+          }
+
+          const selectedProduct = products.find(
+            p => p.name === product && p.weight === parseInt(weight)
+          );
+          if (!selectedProduct) {
+            setResult(t('invalidSelection'));
+            setIsLoading(false);
+            return;
+          }
+
+          const mtPerFCL = selectedProduct.mtPerFCL;
+          const amountDecimals = 1;
+          const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
+          const formattedAmount = formatNumber(amountMt, amountDecimals);
+          const formattedWeight = formatNumber(weight, 0);
+          const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCLDecimals);
+
+          if (!isMultiple(amountMt, mtPerFCL)) {
+            const { lower, higher } = suggestMultiples(amountMt, mtPerFCL);
+            setResult({
+              message: t('multipleError', { mtPerFCL: formattedMtPerFCL }),
+              suggestions: { lower, higher },
+              reference: {
+                product,
+                weight,
+                mtPerFCL
+              }
+            });
+            setIsLoading(false);
+            return;
+          }
+
+          const containers = amountMt / mtPerFCL;
+          const formattedContainers = formatNumber(containers, 0);
+
+          const resultObj = {
+            message: t('resultMessage', {
+              containers: formattedContainers,
+              amount: formattedAmount,
+              product,
+              weight: formattedWeight
+            }),
+            summary: {
+              product,
+              weight: formattedWeight,
+              containers: formattedContainers,
+              amount: formattedAmount
+            },
+            reference: null
+          };
+          setResult(resultObj);
+
+          // Save to recent calculations
+          const newCalc = {
+            message: resultObj.message,
+            timestamp: new Date().toLocaleString()
+          };
+          const updatedCalcs = [newCalc, ...recentCalculations].slice(0, 5);
+          setRecentCalculations(updatedCalcs);
+          localStorage.setItem('recentCalculations', JSON.stringify(updatedCalcs));
+
+          setIsLoading(false);
+        }, 500);
+      };
+
+      // Adjust amount to suggested multiple
+      const adjustAmount = (value) => {
+        setAmount(value, () => {
+          setResult(null);
+          setAmountError('');
+          triggerCalculation(value);
+        });
+      };
+
+      // Calculate containers needed
       const calculateContainers = (e) => {
         e.preventDefault();
+        triggerCalculation(amount);
+      };
 
-        let hasError = false;
-
-        if (!product) {
-          setProductError("Please select a product name.");
-          hasError = true;
-        } else {
-          setProductError('');
+      // Copy result to clipboard
+      const copyResult = () => {
+        if (result && result.message) {
+          const text = result.message.replace(/<[^>]+>/g, '');
+          try {
+            navigator.clipboard.writeText(text).then(() => {
+              alert(t('copySuccess'));
+            }).catch(() => {
+              // Fallback for older browsers
+              const textarea = document.createElement('textarea');
+              textarea.value = text;
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand('copy');
+                alert(t('copySuccess'));
+              } catch (err) {
+                alert(t('copyFailure'));
+              }
+              document.body.removeChild(textarea);
+            });
+          } catch (err) {
+            alert(t('copyFailure'));
+          }
         }
+      };
 
-        if (!weight) {
-          setWeightError("Please select a packaging weight.");
-          hasError = true;
-        } else {
-          setWeightError('');
-        }
-
-        if (!amount) {
-          setResult("Please enter a PO volume.");
-          hasError = true;
-        }
-
-        if (hasError) {
-          return;
-        }
-
-        const amountMt = parseFloat(amount);
-        if (isNaN(amountMt) || amountMt <= 0) {
-          setResult("PO volume must be a positive number.");
-          return;
-        }
-        if (amountMt > 10000.0) {
-          setAmountError("PO volume is too large. Please enter a value up to 10,000.0 MT.");
-          setResult("PO volume is too large. Please enter a value up to 10,000.0 MT.");
-          return;
-        } else {
-          setAmountError('');
-        }
-
-        const selectedProduct = products.find(
-          p => p.name === product && p.weight === parseInt(weight)
-        );
-        if (!selectedProduct) {
-          setResult("Invalid product or weight selection.");
-          return;
-        }
-
-        const mtPerFCL = selectedProduct.mtPerFCL;
-        const amountDecimals = 1; // Always 1 decimal for input
-        const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
-        const formattedAmount = formatNumber(amountMt, amountDecimals);
-        const formattedWeight = formatNumber(weight, 0);
-        const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCLDecimals);
-
-        if (!isMultiple(amountMt, mtPerFCL)) {
-          const { lower, higher } = suggestMultiples(amountMt, mtPerFCL);
-          setResult({
-            message: `The PO volume must be in multiples of ${formattedMtPerFCL} MT. Please revise your PO volume.<br><br><span class="text-blue-800">Suggested values: ${lower} MT or ${higher} MT.</span>`,
-            reference: {
-              product,
-              weight,
-              mtPerFCL
-            }
-          });
-          return;
-        }
-
-        const containers = amountMt / mtPerFCL;
-        const formattedContainers = formatNumber(containers, 0);
-
-        setResult({
-          message: `You will need <span class="font-bold text-blue-600">${formattedContainers}</span> x 20' FCL container(s) for ${formattedAmount} MT of ${product} (Weight: ${formattedWeight} kg).`,
-          reference: null
-        });
+      // Dismiss modal
+      const dismissModal = () => {
+        setShowModal(false);
+        localStorage.setItem('modalDismissed', 'true');
+        productInputRef.current?.focus();
       };
 
       // Rendering the container
       return (
-        <div className="max-w-md mx-auto bg-white p-6 rounded-md shadow-lg">
-          <div className="flex justify-center" style={{ marginBottom: '5px' }}>
-            <img src="https://i.postimg.cc/ZYH2zSww/Etimaden-For-Life-Logo.jpg" alt="Etimaden Logo" className="h-16" />
-          </div>
-          <h1 className="text-2xl font-bold mb-6 text-center">20' FCL Container Calculator</h1>
-          
-          {/* Product selection dropdown */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Product Name</label>
+        <div className="container max-w-lg mx-auto bg-white p-8 rounded-lg shadow-lg">
+          {/* Language Dropdown */}
+          <div className="flex justify-end mb-4">
             <select
+              value={language}
+              onChange={handleLanguageChange}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+              aria-label={t('language')}
+            >
+              <option value="en">English</option>
+              <option value="zh">繁體中文</option>
+              <option value="ms">Bahasa Melayu</option>
+              <option value="tr">Türkçe</option>
+            </select>
+          </div>
+
+          {/* Introductory Modal */}
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm">
+                <h2 className="text-xl font-bold text-blue-900 mb-4">{t('welcome')}</h2>
+                <p className="text-gray-600 mb-4">{t('welcomeText')}</p>
+                <button
+                  onClick={dismissModal}
+                  className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  aria-label={t('getStarted')}
+                >
+                  {t('getStarted')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-center mb-1">
+            <img
+              src="https://raw.githubusercontent.com/zmyeo54/etimaden-html-share/refs/heads/main/assets/Etimaden%20For%20Life%20Logo.png"
+              alt="Etimaden For Life Logo"
+              className="h-25 logo-animate"
+            />
+          </div>
+          <h1 className="text-3xl font-bold mb-8 text-center text-blue-900">{t('title')}</h1>
+
+          {/* Product Search */}
+          <div className="mb-6 relative">
+            <Tooltip text={t('searchTooltip')}>
+              <label htmlFor="productSearch" className="block text-base font-medium text-gray-700 mb-2">
+                {t('searchProduct')}
+              </label>
+            </Tooltip>
+            <div className="relative">
+              <input
+                id="productSearch"
+                type="text"
+                value={productSearch}
+                onChange={handleProductSearchChange}
+                onKeyDown={handleSearchKeyDown}
+                ref={productInputRef}
+                autoFocus
+                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                placeholder={t('searchPlaceholder')}
+                aria-label={t('searchProduct')}
+              />
+              {productSearch && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  aria-label={t('clearSearch')}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            {productSearch && filteredProducts.length > 0 && (
+              <ul className="autocomplete-suggestions mt-1">
+                {filteredProducts.slice(0, 5).map((name, index) => (
+                  <li
+                    key={index}
+                    className="autocomplete-suggestion"
+                    onClick={() => selectProductFromSearch(name)}
+                    role="option"
+                    aria-selected={false}
+                  >
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Product selection dropdown */}
+          <div className="mb-6">
+            <Tooltip text={t('productTooltip')}>
+              <label htmlFor="product" className="block text-base font-medium text-gray-700 mb-2">
+                {t('productName')}
+              </label>
+            </Tooltip>
+            <select
+              id="product"
               value={product}
               onChange={handleProductChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+              aria-label={t('selectProduct')}
+              aria-describedby={productError ? "productError" : undefined}
             >
-              <option value="">Select Product Name</option>
+              <option value="">{t('selectProduct')}</option>
               {uniqueProducts.map((name, index) => (
                 <option key={index} value={name}>{name}</option>
               ))}
             </select>
             {productError && (
-              <p className="mt-1 text-xs text-red-600">{productError}</p>
+              <p id="productError" className="mt-2 text-sm text-red-600 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                {productError}
+              </p>
             )}
           </div>
 
           {/* Weight selection dropdown */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Packaging Weight (kg)</label>
+          <div className="mb-6">
+            <Tooltip text={t('weightTooltip')}>
+              <label htmlFor="weight" className="block text-base font-medium text-gray-700 mb-2">
+                {t('packagingWeight')}
+              </label>
+            </Tooltip>
             <select
+              id="weight"
               value={weight}
               onChange={handleWeightChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ref={weightInputRef}
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               disabled={!product}
+              aria-label={t('selectWeight')}
+              aria-describedby={weightError ? "weightError" : undefined}
             >
-              <option value="">Select Weight</option>
+              <option value="">{t('selectWeight')}</option>
               {availableWeights.map((w, index) => (
                 <option key={index} value={w}>{formatNumber(w, 0)}</option>
               ))}
             </select>
             {weightError && (
-              <p className="mt-1 text-xs text-red-600">{weightError}</p>
+              <p id="weightError" className="mt-2 text-sm text-red-600 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                {weightError}
+              </p>
             )}
           </div>
 
           {/* PO Volume input */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">PO Volume (MT)</label>
+          <div className="mb-6">
+            <Tooltip text={t('volumeTooltip')}>
+              <label htmlFor="amount" className="block text-base font-medium text-gray-700 mb-2">
+                {t('poVolume')}
+              </label>
+            </Tooltip>
             <input
+              id="amount"
               type="text"
               value={amount}
               onChange={handleAmountChange}
               onBlur={handleAmountBlur}
               onKeyDown={handleKeyDown}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter PO volume in MT (e.g., 21.0)"
-              min="0"
+              ref={amountInputRef}
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+              placeholder={t('poPlaceholder')}
+              aria-label={t('poVolume')}
+              aria-describedby={amountError ? "amountError" : undefined}
             />
             {amountError && (
-              <p className="mt-1 text-xs text-red-600">{amountError}</p>
+              <p id="amountError" className="mt-2 text-sm text-red-600 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                {amountError}
+              </p>
             )}
           </div>
 
           {/* Buttons */}
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 mb-6">
             <button
               onClick={calculateContainers}
-              className="flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="flex-1 bg-blue-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-blue-700 hover:scale-105 transform transition focus:outline-none focus:ring-2 focus:ring-blue-600 flex items-center justify-center"
+              disabled={isLoading}
+              aria-label={t('calculate')}
             >
-              Calculate
+              {isLoading ? (
+                <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                </svg>
+              ) : null}
+              {isLoading ? t('calculating') : t('calculate')}
             </button>
             <button
               onClick={handleReset}
-              className="flex-1 bg-gray-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
+              className="flex-1 bg-red-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-red-700 hover:scale-105 transform transition focus:outline-none focus:ring-2 focus:ring-red-600"
+              aria-label={t('reset')}
             >
-              Reset
+              {t('reset')}
             </button>
           </div>
 
           {/* Result display */}
           {result && (
-            <div className="mt-6 p-4 bg-gray-100 rounded-md">
-              <p className={`text-center text-sm ${result.reference ? 'font-bold text-red-600 blink' : 'text-gray-600'}`} dangerouslySetInnerHTML={{ __html: result.message }}></p>
-              {result.reference && (
-                <div className="mt-2 text-xs text-gray-600">
-                  <p><strong>Reference:</strong></p>
-                  <p>Product: {result.reference.product}</p>
-                  <p>Weight: {formatNumber(result.reference.weight, 0)} kg</p>
-                  <p>MT per 20' FCL: {formatNumber(result.reference.mtPerFCL, result.reference.mtPerFCL % 1 === 0 ? 0 : String(result.reference.mtPerFCL).split('.')[1].length)} MT</p>
+            <div
+              className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-white rounded-lg shadow-md"
+              role="alert"
+              aria-live="polite"
+            >
+              <p
+                className={`result-text text-center text-sm ${result.reference ? 'font-bold text-red-600 blink' : 'text-gray-700'}`}
+                dangerouslySetInnerHTML={{ __html: result.message }}
+              ></p>
+              {result.suggestions && (
+                <div className="mt-4 flex justify-center space-x-2">
+                  <button
+                    onClick={() => adjustAmount(result.suggestions.lower)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                    aria-label={t('useLower', { lower: result.suggestions.lower })}
+                  >
+                    {t('useLower', { lower: result.suggestions.lower })}
+                  </button>
+                  <button
+                    onClick={() => adjustAmount(result.suggestions.higher)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                    aria-label={t('useHigher', { higher: result.suggestions.higher })}
+                  >
+                    {t('useHigher', { higher: result.suggestions.higher })}
+                  </button>
                 </div>
               )}
+              {result.summary && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-semibold text-gray-700">{t('summary')}</h3>
+                  <table className="w-full text-sm text-gray-600">
+                    <tbody>
+                      <tr>
+                        <td className="py-1 font-medium">{t('product')}:</td>
+                        <td>{result.summary.product}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-medium">{t('weight')}:</td>
+                        <td>{result.summary.weight} kg</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-medium">{result.summary.containers === "1" ? t('container') : t('containers')}:</td>
+                        <td>{result.summary.containers}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-medium">{t('volume')}:</td>
+                        <td>{result.summary.amount} MT</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <button
+                    onClick={copyResult}
+                    className="mt-4 w-full bg-gray-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                    aria-label={t('copyResult')}
+                  >
+                    {t('copyResult')}
+                  </button>
+                </div>
+              )}
+              {result.reference && (
+                <div className="mt-4 text-sm text-gray-600">
+                  <p><strong>{t('reference')}:</strong></p>
+                  <p>{t('product')}: {result.reference.product}</p>
+                  <p>{t('weight')}: {formatNumber(result.reference.weight, 0)} kg</p>
+                  <p>{t('mtPerFCL')}: {formatNumber(result.reference.mtPerFCL, result.reference.mtPerFCL % 1 === 0 ? 0 : String(result.reference.mtPerFCL).split('.')[1].length)} MT</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Recent Calculations */}
+          {recentCalculations.length > 0 && (
+            <div className="mt-8">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-700">{t('recentCalculations')}</h2>
+                <button
+                  onClick={clearHistory}
+                  className="bg-red-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm"
+                  aria-label={t('clearAll')}
+                >
+                  {t('clearAll')}
+                </button>
+              </div>
+              <ul className="space-y-2">
+                {recentCalculations.map((calc, index) => (
+                  <li key={index} className="p-4 bg-gray-50 rounded-md text-sm text-gray-600">
+                    <p dangerouslySetInnerHTML={{ __html: calc.message }}></p>
+                    <p className="text-xs text-gray-500 mt-1">{calc.timestamp}</p>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
       );
     };
+
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
 
     // Rendering the app
     const root = ReactDOM.createRoot(document.getElementById('root'));
