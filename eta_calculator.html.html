@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ETA Calculator</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    input, textarea, select {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .logo-animate {
+      animation: fadeIn 1s ease-in;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      background-color: #1E3A8A;
+      color: white;
+      text-align: center;
+      border-radius: 6px;
+      padding: 4px 8px;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 12px;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    
+    .tooltip .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1E3A8A transparent transparent transparent;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .border-blue-200 {
+      border-color: #DBEAFE;
+    }
+    
+    .bg-gradient-to-r {
+      background-image: linear-gradient(to right, var(--tw-gradient-stops));
+    }
+    
+    .from-blue-50 {
+      --tw-gradient-from: #EFF6FF;
+      --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(239, 246, 255, 0));
+    }
+    
+    .to-white {
+      --tw-gradient-to: #FFFFFF;
+    }
+    
+    .app-container {
+      width: 100%;
+      max-width: 36rem;
+      min-height: 600px;
+    }
+    
+    .summary-section {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .summary-header {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 0.75rem;
+    }
+    
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      align-items: flex-end;
+    }
+    
+    .summary-label {
+      font-weight: 500;
+      color: #374151;
+    }
+    
+    .summary-value {
+      color: #4b5563;
+    }
+    
+    .final-price {
+      background-color: #F3E8FF;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      font-size: 1.25rem;
+    }
+    
+    .modal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 20;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .close-button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #4B5563;
+    }
+    
+    .close-button:hover {
+      color: #1E3A8A;
+    }
+    
+    .disclaimer-section {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      color: #6b7280;
+      text-align: left;
+    }
+    
+    @media (max-width: 640px) {
+      .app-container {
+        padding: 1rem;
+      }
+      label {
+        font-size: 14px;
+      }
+      input, select, button {
+        font-size: 14px;
+        padding: 0.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .result-text {
+        font-size: 12px;
+      }
+      .tooltip .tooltip-text {
+        width: 200px;
+      }
+      .summary-header {
+        font-size: 1rem;
+      }
+      .final-price {
+        font-size: 1rem;
+      }
+      .modal-content {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-200 min-h-screen flex items-center justify-center">
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    // Language translations
+    const translations = {
+      en: {
+        title: "ETA Calculator",
+        welcomeTitle: "Welcome to ETA Calculator",
+        welcomeMessage: "We are delighted to have you here! The ETA Calculator helps you estimate the Expected Time of Arrival (ETA) for shipments using the Estimated Date of Departure (ETD), destination country, port of discharge, and optional pricing details.",
+        welcomeInstruction2: "<br><ul><li>Please select your preferred language to proceed.</li></ul>",
+        etdLabel: "Estimated Date of Departure (ETD)",
+        etdTooltip: "Select the estimated departure date",
+        todayButton: "Today",
+        countryLabel: "Country",
+        countryTooltip: "Select the destination country",
+        regionLabel: "Region",
+        regionTooltip: "Select the region (for China only)",
+        podLabel: "Port of Discharge (POD)",
+        podTooltip: "Select the port of discharge",
+        unitPriceLabel: "Unit Price (USD/MT)",
+        unitPriceTooltip: "Enter the base unit price per metric ton (optional, e.g., 575)",
+        smallBags20kg: "Small bags - 20kg/25kg FFS/Laminated PP (USD 15/MT additional)",
+        smallBags20kgTooltip: "Adds USD 15 per metric ton to the unit price",
+        smallBagsKraft: "Small bags - 20kg/25kg Kraft (USD 25/MT additional)",
+        smallBagsKraftTooltip: "Adds USD 25 per metric ton to the unit price",
+        calculateButton: "Calculate",
+        calculating: "Calculating...",
+        resetButton: "Reset",
+        recentResults: "Recent Results",
+        carianTerkini: "Carian Terkini",
+        clearAll: "Clear All",
+        selectOption: "Select",
+        summary: "Summary",
+        priceCalculator: "Price Calculator",
+        priceCalculatorSubheader: "<i>Optional - proceed without this if ETA alone suffices</i>",
+        etd: "ETD",
+        pod: "Port of Discharge",
+        preparationTime: "Preparation Time",
+        transitTime: "Transit Time",
+        eta: "ETA",
+        unitPrice: "Unit Price",
+        portAdditionalPrice: "Port Additional Price",
+        bagAdditionalPrice: "Bag Additional Price",
+        finalPrice: "Final Price",
+        shippingDetails: "Shipping Details",
+        timing: "Time Taken",
+        pricing: "Pricing",
+        resultMessage: "The shipment with an ETD of <date> is estimated to arrive (ETA) at <pod> on <eta>",
+        resultMessageWithPrice: "The shipment with an ETD of <date> is estimated to arrive (ETA) at <pod> on <eta> with a final price of <price> USD/MT",
+        noteETDAdjusted: "❖ The initial ETD was too short, not providing the required 20 days preparation time. The new ETD is adjusted to ",
+        noteSmallBags20kg: "<br>❖ Small bags - 20kg/25kg FFS/Laminated PP adds USD 15/MT.",
+        noteSmallBagsKraft: "<br>❖ Small bags - 20kg/25kg Kraft adds USD 25/MT.",
+        noteSpotPrice: "Port additional price is 'Spot' for <pod>, treated as USD 0 USD/MT.",
+        disclaimer: "Disclaimer: The Estimated Date of Departure (ETD) and Estimated Time of Arrival (ETA) dates are based on the entry of the order into the Online Order system as of Friday, June 20, 2025. These dates are subject to change based on operational conditions.",
+        copyResult: "Copy Result"
+      },
+      zh: {
+        title: "預計抵港時間(ETA)計算器",
+        welcomeTitle: "歡迎使用 ETA 計算器",
+        welcomeMessage: "我們很高興您來到這裡！ETA 計算器幫助您估算貨物的預計抵港時間 (ETA)，使用預計離港日期 (ETD)、目的地國家、卸貨港以及可選的定價細節。",
+        welcomeInstruction2: "<br><ul><li>請選擇您偏好的語言以繼續。</li></ul>",
+        etdLabel: "預計離港日期 (ETD)",
+        etdTooltip: "選擇預計出發日期",
+        todayButton: "今天",
+        countryLabel: "國家（地區）",
+        countryTooltip: "選擇目的地國家",
+        regionLabel: "地區",
+        regionTooltip: "選擇地區（僅限中國）",
+        podLabel: "卸貨港 (POD)",
+        podTooltip: "選擇卸貨港",
+        unitPriceLabel: "單位價格 (美元/公噸)",
+        unitPriceTooltip: "輸入每公噸的基礎單位價格（可選，例如 575）",
+        smallBags20kg: "小袋 - 20公斤/25公斤 FFS/Laminated PP（額外 USD 15/公噸）",
+        smallBags20kgTooltip: "每公噸增加 USD 15",
+        smallBagsKraft: "小袋 - 20公斤/25公斤 Kraft（額外 USD 25/公噸）",
+        smallBagsKraftTooltip: "每公噸增加 USD 25",
+        calculateButton: "計算",
+        calculating: "計算中...",
+        resetButton: "重置",
+        recentResults: "近期結果",
+        carianTerkini: "近期搜尋",
+        clearAll: "全部清除",
+        selectOption: "選擇",
+        summary: "摘要",
+        priceCalculator: "價格計算器",
+        priceCalculatorSubheader: "<i>可選 - 若僅需 ETA 則可省略此部分</i>",
+        etd: "預計出發時間",
+        pod: "卸貨港",
+        preparationTime: "準備時間",
+        transitTime: "運輸時間",
+        eta: "預計到達時間",
+        unitPrice: "單位價格",
+        portAdditionalPrice: "港口額外價格",
+        bagAdditionalPrice: "袋子額外價格",
+        finalPrice: "最終價格",
+        shippingDetails: "運輸詳情",
+        timing: "所需時間",
+        pricing: "定價",
+        resultMessage: "預計出發時間 (ETD) 為 <date> 的貨物預計到達時間 (ETA) 為 <eta>，抵達 <pod>",
+        resultMessageWithPrice: "預計出發時間 (ETD) 為 <date> 的貨物預計到達時間 (ETA) 為 <eta>，抵達 <pod>，最終價格為 <price> 美元/公噸",
+        noteETDAdjusted: "❖ 最初的 ETD 時間過短，未能提供所需的 20 天準備時間。新 ETD 已調整為 ",
+        noteSmallBags20kg: "<br>❖ 小袋 - 20公斤/25公斤 FFS/Laminated PP 每公噸增加 USD 15。",
+        noteSmallBagsKraft: "<br>❖ 小袋 - 20公斤/25公斤 Kraft 每公噸增加 USD 25。",
+        noteSpotPrice: "港口額外價格為 '<pod>' 的 '即時價格'，視為 USD 0 USD/公噸。",
+        disclaimer: "免責聲明：預計離港日期 (ETD) 及預計抵港時間 (ETA) 日期基於訂單於 2025 年 6 月 20 日星期五進入線上訂單系統的數據。這些日期可能會因運營條件而變更。",
+        copyResult: "複製結果"
+      },
+      "zh-cn": {
+        title: "预计抵港时间(ETA)计算器",
+        welcomeTitle: "欢迎使用 ETA 计算器",
+        welcomeMessage: "我们很高兴您来到这里！ETA 计算器帮助您估算货物的预计抵港时间 (ETA)，使用预计离港日期 (ETD)、目的地国家、卸货港以及可选的定价详情。",
+        welcomeInstruction2: "<br><ul><li>请选择您偏好的语言以继续。</li></ul>",
+        etdLabel: "预计离港日期 (ETD)",
+        etdTooltip: "选择预计出发日期",
+        todayButton: "今天",
+        countryLabel: "国家（地区）",
+        countryTooltip: "选择目的地国家",
+        regionLabel: "地区",
+        regionTooltip: "选择地区（仅限中国）",
+        podLabel: "卸货港 (POD)",
+        podTooltip: "选择卸货港",
+        unitPriceLabel: "单位价格 (美元/公吨)",
+        unitPriceTooltip: "输入每公吨的基础单位价格（可选，例如 575）",
+        smallBags20kg: "小袋 - 20公斤/25公斤 FFS/Laminated PP（额外 USD 15/公吨）",
+        smallBags20kgTooltip: "每公吨增加 USD 15",
+        smallBagsKraft: "小袋 - 20公斤/25kg Kraft（额外 USD 25/公吨）",
+        smallBagsKraftTooltip: "每公吨增加 USD 25",
+        calculateButton: "计算",
+        calculating: "计算中...",
+        resetButton: "重置",
+        recentResults: "近期结果",
+        carianTerkini: "近期搜索",
+        clearAll: "全部清除",
+        selectOption: "选择",
+        summary: "摘要",
+        priceCalculator: "价格计算器",
+        priceCalculatorSubheader: "<i>可选 - 若仅需 ETA 则可省略此部分</i>",
+        etd: "预计出发时间",
+        pod: "卸货港",
+        preparationTime: "准备时间",
+        transitTime: "运输时间",
+        eta: "预计抵港时间",
+        unitPrice: "单位价格",
+        portAdditionalPrice: "港口额外价格",
+        bagAdditionalPrice: "袋子额外价格",
+        finalPrice: "最终价格",
+        shippingDetails: "运输详情",
+        timing: "所需时间",
+        pricing: "定价",
+        resultMessage: "预计出发时间 (ETD) 为 <date> 的货物预计抵港时间 (ETA) 为 <eta>，到达 <pod>",
+        resultMessageWithPrice: "预计出发时间 (ETD) 为 <date> 的货物预计抵港时间 (ETA) 为 <eta>，到达 <pod>，最终价格为 <price> 美元/公吨",
+        noteETDAdjusted: "❖ 最初的 ETD 时间过短，未能提供所需的 20 天准备时间。新 ETD 已调整为 ",
+        noteSmallBags20kg: "<br>❖ 小袋 - 20公斤/25公斤 FFS/Laminated PP 每公吨增加 USD 15。",
+        noteSmallBagsKraft: "<br>❖ 小袋 - 20公斤/25公斤 Kraft 每公吨增加 USD 25。",
+        noteSpotPrice: "港口额外价格为 '<pod>' 的 '即时价格'，视为 USD 0 USD/公吨。",
+        disclaimer: "免责声明：预计离港日期 (ETD) 及预计抵港时间 (ETA) 日期基于订单于 2025 年 6 月 20 日星期五进入在线订单系统的记录。这些日期可能因运营条件而更改。",
+        copyResult: "复制结果"
+      },
+      tr: {
+        title: "ETA Hesaplayıcı",
+        welcomeTitle: "ETA Hesaplayıcı'ya Hoş Geldiniz",
+        welcomeMessage: "Sizi burada görmekten mutluluk duyuyoruz! ETA Hesaplayıcı, Tahmini Varış Zamanı (ETA) tahminlerinizi kolaylaştırmak için tasarlanmış bir araçtır. Tahmini Kalkış Tarihi (ETD), hedef ülke, boşaltma limanı ve isteğe bağlı fiyatlandırma detaylarını kullanarak tahminler yapabilirsiniz.",
+        welcomeInstruction2: "<br><ul><li>Lütfen devam etmek için tercih ettiğiniz dili seçin.</li></ul>",
+        etdLabel: "Tahmini Kalkış Tarihi (ETD)",
+        etdTooltip: "Tahmini kalkış tarihini seçin",
+        todayButton: "Bugün",
+        countryLabel: "Ülke",
+        countryTooltip: "Hedef ülkeyi seçin",
+        regionLabel: "Bölge",
+        regionTooltip: "Bölgeyi seçin (yalnızca Çin için)",
+        podLabel: "Boşaltma Limanı (POD)",
+        podTooltip: "Boşaltma limanını seçin",
+        unitPriceLabel: "Birim Fiyat (USD/MT)",
+        unitPriceTooltip: "Metrik ton başına temel birim fiyatı girin (isteğe bağlı, örneğin 575)",
+        smallBags20kg: "Küçük çantalar - 20kg/25kg FFS/Laminated PP (ekstra USD 15/MT)",
+        smallBags20kgTooltip: "Metrik ton başına USD 15 ekler",
+        smallBagsKraft: "Küçük çantalar - 20kg/25kg Kraft (ekstra USD 25/MT)",
+        smallBagsKraftTooltip: "Metrik ton başına USD 25 ekler",
+        calculateButton: "Hesapla",
+        calculating: "Hesaplanıyor...",
+        resetButton: "Sıfırla",
+        recentResults: "Son Sonuçlar",
+        carianTerkini: "Son Aramalar",
+        clearAll: "Hepsini Temizle",
+        selectOption: "Seç",
+        summary: "Özet",
+        priceCalculator: "Fiyat Hesaplayıcı",
+        priceCalculatorSubheader: "<i>İsteğe bağlı - yalnızca ETA gerekiyorsa bu bölümü atlayabilirsiniz</i>",
+        etd: "ETD",
+        pod: "Boşaltma Limanı",
+        preparationTime: "Hazırlık Süresi",
+        transitTime: "Transit Süresi",
+        eta: "ETA",
+        unitPrice: "Birim Fiyat",
+        portAdditionalPrice: "Liman Ek Fiyatı",
+        bagAdditionalPrice: "Çanta Ek Fiyatı",
+        finalPrice: "Nihai Fiyat",
+        shippingDetails: "Nakliye Detayları",
+        timing: "Her Süreç İçin Geçen Zaman",
+        pricing: "Fiyatlandırma",
+        resultMessage: "Tahmini Kalkış Tarihi (ETD) <date> olan sevkiyatın, <pod> limanına Tahmini Varış Zamanı (ETA) <eta> tarihinde olması bekleniyor",
+        resultMessageWithPrice: "Tahmini Kalkış Tarihi (ETD) <date> olan sevkiyatın, <pod> limanına Tahmini Varış Zamanı (ETA) <eta> tarihinde olması bekleniyor, nihai fiyatı <price> USD/MT",
+        noteETDAdjusted: "❖ İlk ETD süresi çok kısaydı ve gerekli 20 gün hazırlık süresini sağlamadı. Yeni ETD ",
+        noteSmallBags20kg: "<br>❖ Küçük çantalar - 20kg/25kg FFS/Laminated PP her metrik ton için USD 15 ekler.",
+        noteSmallBagsKraft: "<br>❖ Küçük çantalar - 20kg/25kg Kraft her metrik ton için USD 25 ekler.",
+        noteSpotPrice: "Liman ek fiyatı '<pod>' için 'Spot' olarak belirlenmiş ve USD 0 USD/MT olarak kabul edilmiştir.",
+        disclaimer: "Sorumluluk Reddi: Tahmini Kalkış Tarihi (ETD) ve Tahmini Varış Zamanı (ETA) tarihleri, siparişin 20 Haziran 2025 Cuma günü Online Sipariş sistemine girişine dayanmaktadır. Bu tarihler, operasyonel koşullara bağlı olarak değişebilir.",
+        copyResult: "Sonucu Kopyala"
+      },
+      ms: {
+        title: "Kalkulator ETA",
+        welcomeTitle: "Selamat Datang ke Kalkulator ETA",
+        welcomeMessage: "Kami gembira mengalu-alukan anda di sini! Kalkulator ETA membantu anda menganggarkan Tarikh Ketibaan Jangkaan (ETA) bagi penghantaran anda berdasarkan Tarikh Berlepas Anggaran (ETD), negara destinasi, pelabuhan pelepasan, dan butiran harga pilihan.",
+        welcomeInstruction2: "<br><ul><li>Sila pilih bahasa yang anda inginkan untuk meneruskan.</li></ul>",
+        etdLabel: "Anggaran Tarikh Berlepas (ETD)",
+        etdTooltip: "Pilih tarikh berlepas anggaran",
+        todayButton: "Hari Ini",
+        countryLabel: "Negara",
+        countryTooltip: "Pilih negara destinasi",
+        regionLabel: "Wilayah",
+        regionTooltip: "Pilih wilayah (hanya untuk China)",
+        podLabel: "Pelabuhan Pelepasan (POD)",
+        podTooltip: "Pilih pelabuhan pelepasan",
+        unitPriceLabel: "Harga Unit (USD/MT)",
+        unitPriceTooltip: "Masukkan harga unit asas per tan metrik (pilihan, contohnya 575)",
+        smallBags20kg: "Beg kecil - 20kg/25kg FFS/Laminated PP (USD 15/MT tambahan)",
+        smallBags20kgTooltip: "Menambah USD 15 setiap tan metrik",
+        smallBagsKraft: "Beg kecil - 20kg/25kg Kraft (USD 25/MT tambahan)",
+        smallBagsKraftTooltip: "Menambah USD 25 setiap tan metrik",
+        calculateButton: "Kira",
+        calculating: "Mengira...",
+        resetButton: "Tetapkan Semula",
+        recentResults: "Keputusan Terkini",
+        carianTerkini: "Carian Terkini",
+        clearAll: "Kosongkan Semua",
+        selectOption: "Pilih",
+        summary: "Ringkasan",
+        priceCalculator: "Kalkulator Harga",
+        priceCalculatorSubheader: "<i>Pilihan - boleh dilangkau jika hanya memerlukan ETA</i>",
+        etd: "ETD",
+        pod: "Pelabuhan Pelepasan",
+        preparationTime: "Masa Persiapan",
+        transitTime: "Masa Transit",
+        eta: "ETA",
+        unitPrice: "Harga Unit",
+        portAdditionalPrice: "Harga Tambahan Pelabuhan",
+        bagAdditionalPrice: "Harga Tambahan Beg",
+        finalPrice: "Harga Akhir",
+        shippingDetails: "Butiran Penghantaran",
+        timing: "Masa Diambil untuk Setiap Proses",
+        pricing: "Penentuan Harga",
+        resultMessage: "Penghantaran dengan Anggaran Tarikh Berlepas (ETD) pada <date> dijangka tiba (ETA) di <pod> pada <eta>",
+        resultMessageWithPrice: "Penghantaran dengan Anggaran Tarikh Berlepas (ETD) pada <date> dijangka tiba (ETA) di <pod> pada <eta> dengan harga akhir <price> USD/MT",
+        noteETDAdjusted: "❖ Tarikh ETD awal terlalu singkat, tidak cukup 20 hari masa persiapan yang diperlukan. Tarikh ETD baru telah disesuaikan kepada ",
+        noteSmallBags20kg: "<br>❖ Beg kecil - 20kg/25kg FFS/Laminated PP menambah USD 15 setiap tan metrik.",
+        noteSmallBagsKraft: "<br>❖ Beg kecil - 20kg/25kg Kraft menambah USD 25 setiap tan metrik.",
+        noteSpotPrice: "Harga tambahan pelabuhan adalah 'Spot' untuk <pod>, dirawat sebagai USD 0 USD/MT.",
+        disclaimer: "Penafian: Tarikh Berlepas Anggaran (ETD) dan Tarikh Ketibaan Jangkaan (ETA) berdasarkan entri pesanan ke dalam sistem Pesanan Dalam Talian pada Jumaat, 20 Jun 2025. Tarikh-tarikh ini tertakluk kepada perubahan berdasarkan keadaan operasi.",
+        copyResult: "Salin Keputusan"
+      }
+    };
+
+    // Port data
+    const portsData = [
+      { pod: "Chattogram", additionalPrice: 0, transitTime: 65, country: "Bangladesh", region: "Bangladesh" },
+      { pod: "Anqing", additionalPrice: 8, transitTime: 60, country: "China", region: "South" },
+      { pod: "Baiyang Port, Yichang", additionalPrice: 5, transitTime: 70, country: "China", region: "South" },
+      { pod: "Changsha", additionalPrice: 7, transitTime: 75, country: "China", region: "South" },
+      { pod: "Changzhou", additionalPrice: 16, transitTime: 60, country: "China", region: "South" },
+      { pod: "Chongqing", additionalPrice: 12, transitTime: 75, country: "China", region: "South" },
+      { pod: "Dalian", additionalPrice: 4, transitTime: 60, country: "China", region: "North" },
+      { pod: "Dandong", additionalPrice: 8, transitTime: 60, country: "China", region: "North" },
+      { pod: "Dongfa Old Port, Nansha", additionalPrice: 15, transitTime: 60, country: "China", region: "South" },
+      { pod: "Huangpu", additionalPrice: 10, transitTime: 60, country: "China", region: "South" },
+      { pod: "Jisi Port, Huangpu New Port", additionalPrice: 10, transitTime: 60, country: "China", region: "South" },
+      { pod: "Jiujiang", additionalPrice: 9, transitTime: 60, country: "China", region: "South" },
+      { pod: "Luzhou", additionalPrice: 32, transitTime: 75, country: "China", region: "South" },
+      { pod: "Nanjing", additionalPrice: 0, transitTime: 60, country: "China", region: "South" },
+      { pod: "Nansha", additionalPrice: 15, transitTime: 60, country: "China", region: "South" },
+      { pod: "Ningbo", additionalPrice: 4, transitTime: 55, country: "China", region: "South" },
+      { pod: "Qingdao", additionalPrice: 0, transitTime: 55, country: "China", region: "North" },
+      { pod: "Qingyuan", additionalPrice: 13, transitTime: 60, country: "China", region: "South" },
+      { pod: "Sanshui", additionalPrice: 0, transitTime: 60, country: "China", region: "South" },
+      { pod: "Shanghai", additionalPrice: 0, transitTime: 55, country: "China", region: "South" },
+      { pod: "Shekou", additionalPrice: 1, transitTime: 55, country: "China", region: "South" },
+      { pod: "Tianjin", additionalPrice: 0, transitTime: 60, country: "China", region: "North" },
+      { pod: "Wuhan", additionalPrice: 0, transitTime: 65, country: "China", region: "South" },
+      { pod: "Xiamen", additionalPrice: 0, transitTime: 55, country: "China", region: "South" },
+      { pod: "Xingang, Tianjin", additionalPrice: 0, transitTime: 60, country: "China", region: "North" },
+      { pod: "Xinsha Port, Huangpu", additionalPrice: 10, transitTime: 65, country: "China", region: "South" },
+      { pod: "Yantian", additionalPrice: 0, transitTime: 55, country: "China", region: "South" },
+      { pod: "Yichang", additionalPrice: 12, transitTime: 70, country: "China", region: "South" },
+      { pod: "Zhangjiagang", additionalPrice: 4, transitTime: 65, country: "China", region: "South" },
+      { pod: "Belawan", additionalPrice: 10, transitTime: 50, country: "Indonesia", region: "Indonesia" },
+      { pod: "Jakarta", additionalPrice: 10, transitTime: 50, country: "Indonesia", region: "Indonesia" },
+      { pod: "Surabaya", additionalPrice: 10, transitTime: 50, country: "Indonesia", region: "Indonesia" },
+      { pod: "Busan", additionalPrice: 0, transitTime: 55, country: "Korea", region: "Korea" },
+      { pod: "Bintulu", additionalPrice: 15, transitTime: 65, country: "Malaysia", region: "Malaysia" },
+      { pod: "Kuching", additionalPrice: 15, transitTime: 50, country: "Malaysia", region: "Malaysia" },
+      { pod: "Port Klang", additionalPrice: 0, transitTime: 40, country: "Malaysia", region: "Malaysia" },
+      { pod: "Sandakan", additionalPrice: 15, transitTime: 55, country: "Malaysia", region: "Malaysia" },
+      { pod: "Sibu", additionalPrice: 15, transitTime: 45, country: "Malaysia", region: "Malaysia" },
+      { pod: "Tawau", additionalPrice: 15, transitTime: 50, country: "Malaysia", region: "Malaysia" },
+      { pod: "Yangon", additionalPrice: 0, transitTime: 50, country: "Myanmar", region: "Myanmar" },
+      { pod: "Batangas", additionalPrice: 14, transitTime: 55, country: "Philippines", region: "Philippines" },
+      { pod: "Cebu", additionalPrice: 0, transitTime: 60, country: "Philippines", region: "Philippines" },
+      { pod: "Davao", additionalPrice: 0, transitTime: 50, country: "Philippines", region: "Philippines" },
+      { pod: "Manila", additionalPrice: 0, transitTime: 55, country: "Philippines", region: "Philippines" },
+      { pod: "Manila North Harbour", additionalPrice: 0, transitTime: 55, country: "Philippines", region: "Philippines" },
+      { pod: "Manila South Harbour", additionalPrice: 0, transitTime: 55, country: "Philippines", region: "Philippines" },
+      { pod: "Subic Bay", additionalPrice: 0, transitTime: 50, country: "Philippines", region: "Philippines" },
+      { pod: "Singapore", additionalPrice: "Spot", transitTime: 45, country: "Singapore", region: "Singapore" },
+      { pod: "Colombo", additionalPrice: 0, transitTime: 65, country: "Sri Lanka", region: "Sri Lanka" },
+      { pod: "Kaohsiung", additionalPrice: 0, transitTime: 55, country: "Taiwan", region: "Taiwan" },
+      { pod: "Keelung", additionalPrice: 8, transitTime: 55, country: "Taiwan", region: "Taiwan" },
+      { pod: "Taichung", additionalPrice: 0, transitTime: 60, country: "Taiwan", region: "Taiwan" },
+      { pod: "Taoyuan", additionalPrice: 5, transitTime: 55, country: "Taiwan", region: "Taiwan" },
+      { pod: "Bangkok", additionalPrice: 0, transitTime: 50, country: "Thailand", region: "Thailand" },
+      { pod: "Laem Chabang", additionalPrice: 0, transitTime: 50, country: "Thailand", region: "Thailand" },
+      { pod: "Songkhla", additionalPrice: 10, transitTime: 50, country: "Thailand", region: "Thailand" },
+      { pod: "Cai Mep Port, Ho Chi Minh", additionalPrice: 0, transitTime: 70, country: "Vietnam", region: "Vietnam" },
+      { pod: "Cat Lai Port", additionalPrice: 0, transitTime: 50, country: "Vietnam", region: "Vietnam" },
+      { pod: "Danang", additionalPrice: 0, transitTime: 50, country: "Vietnam", region: "Vietnam" },
+      { pod: "Haiphong", additionalPrice: 0, transitTime: 50, country: "Vietnam", region: "Vietnam" },
+      { pod: "Ho Chi Minh City Port", additionalPrice: 0, transitTime: 50, country: "Vietnam", region: "Vietnam" },
+    ];
+
+    // Utility functions
+    const formatNumber = (num, decimals = 0) => {
+      if (isNaN(num)) return "0";
+      return Math.round(Number(num)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    const formatDate = (date) => {
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    };
+
+    const formatTimeWithSeconds = (date) => {
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedHours = hours % 12 || 12;
+      return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${ampm}`;
+    };
+
+    const getDaysDifference = (date1, date2) => {
+      const diffTime = Math.abs(date2 - date1);
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    };
+
+    // Tooltip component
+    const Tooltip = ({ children, text }) => (
+      <div className="tooltip">
+        {children}
+        <span className="tooltip-text">{text}</span>
+      </div>
+    );
+
+    // Icons
+    const AlertCircle = () => (
+      <svg className="w-4 h-6" fill="black" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+      </svg>
+    );
+
+    const Loader = () => (
+      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+      </svg>
+    );
+
+    // Main component
+    const ETACalculator = () => {
+      const today = new Date('2025-06-20T18:39:00+08:00').toISOString().split('T')[0]; // Updated to 06:39 PM HKT
+      const [etd, setEtd] = React.useState(today);
+      const [country, setCountry] = React.useState('');
+      const [region, setRegion] = React.useState('');
+      const [pod, setPod] = React.useState('');
+      const [unitPrice, setUnitPrice] = React.useState('');
+      const [smallBags20kg, setSmallBags20kg] = React.useState(false);
+      const [smallBagsKraft, setSmallBagsKraft] = React.useState(false);
+      const [result, setResult] = React.useState(null);
+      const [errors, setErrors] = React.useState({
+        etd: '',
+        country: '',
+        region: '',
+        pod: '',
+        unitPrice: '',
+        smallBags: ''
+      });
+      const [isLoading, setIsLoading] = React.useState(false);
+      const [recentCalculations, setRecentCalculations] = React.useState([]);
+      const [language, setLanguage] = React.useState('en'); // Default to English
+      const [currentTime, setCurrentTime] = React.useState(new Date('2025-06-20T18:39:00+08:00'));
+      const [showWelcome, setShowWelcome] = React.useState(true);
+
+      const etdInputRef = React.useRef(null);
+
+      // Update time every second
+      React.useEffect(() => {
+        const timer = setInterval(() => {
+          setCurrentTime(new Date());
+        }, 1000);
+        return () => clearInterval(timer);
+      }, []);
+
+      // Get unique countries
+      const uniqueCountries = [...new Set(portsData.map(p => p.country))].sort();
+
+      // Get regions for China
+      const regions = ["North", "South"];
+
+      // Get available PODs based on country and region
+      const availablePods = portsData
+        .filter(p => p.country === country && (country !== "China" || p.region === region))
+        .map(p => p.pod)
+        .sort();
+
+      // Load recent calculations from local storage
+      React.useEffect(() => {
+        const saved = localStorage.getItem('recentCalculationsETA');
+        if (saved) {
+          setRecentCalculations(JSON.parse(saved));
+        }
+      }, []);
+
+      // Focus ETD input on mount
+      React.useEffect(() => {
+        etdInputRef.current?.focus();
+      }, [language]);
+
+      const clearErrors = () => {
+        setErrors({
+          etd: '',
+          country: '',
+          region: '',
+          pod: '',
+          unitPrice: '',
+          smallBags: ''
+        });
+      };
+
+      const handleEtdChange = (e) => {
+        setEtd(e.target.value);
+        setResult(null);
+        clearErrors();
+      };
+
+      const handleSetToday = () => {
+        setEtd(today);
+        setResult(null);
+        clearErrors();
+      };
+
+      const handleCountryChange = (e) => {
+        setCountry(e.target.value);
+        setRegion('');
+        setPod('');
+        setUnitPrice('');
+        setSmallBags20kg(false);
+        setSmallBagsKraft(false);
+        setResult(null);
+        clearErrors();
+      };
+
+      const handleRegionChange = (e) => {
+        setRegion(e.target.value);
+        setPod('');
+        setUnitPrice('');
+        setSmallBags20kg(false);
+        setSmallBagsKraft(false);
+        setResult(null);
+        clearErrors();
+      };
+
+      const handlePodChange = (e) => {
+        setPod(e.target.value);
+        setUnitPrice('');
+        setSmallBags20kg(false);
+        setSmallBagsKraft(false);
+        setResult(null);
+        clearErrors();
+      };
+
+      const handleUnitPriceChange = (e) => {
+        const value = e.target.value;
+        if (value === "" || /^\d*$/.test(value)) {
+          setUnitPrice(value);
+          setResult(null);
+          clearErrors();
+        }
+      };
+
+      const handleUnitPriceBlur = () => {
+        if (unitPrice) {
+          const formatted = parseInt(unitPrice, 10);
+          if (!isNaN(formatted)) {
+            setUnitPrice(formatted.toString());
+          }
+        }
+      };
+
+      const handleSmallBags20kgChange = (e) => {
+        setSmallBags20kg(e.target.checked);
+        if (e.target.checked && smallBagsKraft) {
+          setSmallBagsKraft(false);
+        }
+        setResult(null);
+        clearErrors();
+      };
+
+      const handleSmallBagsKraftChange = (e) => {
+        setSmallBagsKraft(e.target.checked);
+        if (e.target.checked && smallBags20kg) {
+          setSmallBags20kg(false);
+        }
+        setResult(null);
+        clearErrors();
+      };
+
+      const handleReset = () => {
+        setEtd(today);
+        setCountry('');
+        setRegion('');
+        setPod('');
+        setUnitPrice('');
+        setSmallBags20kg(false);
+        setSmallBagsKraft(false);
+        setResult(null);
+        clearErrors();
+        etdInputRef.current?.focus();
+      };
+
+      const clearHistory = () => {
+        setRecentCalculations([]);
+        localStorage.removeItem('recentCalculationsETA');
+      };
+
+      const calculateETA = (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        setTimeout(() => {
+          const newErrors = { ...errors };
+          let hasError = false;
+
+          if (!etd) {
+            newErrors.etd = "Please select a departure date.";
+            hasError = true;
+          }
+
+          if (!country) {
+            newErrors.country = "Please select a country.";
+            hasError = true;
+          }
+
+          if (country === "China" && !region) {
+            newErrors.region = "Please select a region.";
+            hasError = true;
+          }
+
+          if (!pod) {
+            newErrors.pod = "Please select a port of discharge.";
+            hasError = true;
+          }
+
+          if (unitPrice) {
+            const unitPriceValue = parseInt(unitPrice, 10);
+            if (isNaN(unitPriceValue) || unitPriceValue <= 0) {
+              newErrors.unitPrice = "Unit price must be a positive number.";
+              hasError = true;
+            } else if (unitPriceValue > 10000) {
+              newErrors.unitPrice = "Unit price is too large. Please enter a value up to 10,000 USD/MT.";
+              hasError = true;
+            }
+          }
+
+          if (smallBags20kg && smallBagsKraft) {
+            newErrors.smallBags = "Please select only one small bags option.";
+            hasError = true;
+          }
+
+          setErrors(newErrors);
+
+          if (hasError) {
+            setIsLoading(false);
+            return;
+          }
+
+          const selectedPort = portsData.find(
+            p => p.pod === pod && p.country === country && (country !== "China" || p.region === region)
+          );
+
+          if (!selectedPort) {
+            setIsLoading(false);
+            return;
+          }
+
+          const transitTime = selectedPort.transitTime;
+          const preparationTime = 20;
+          const etdDate = new Date(etd);
+          const todayDate = new Date('2025-06-20T18:39:00+08:00'); // Updated to 06:39 PM HKT
+          const daysDiff = getDaysDifference(todayDate, etdDate);
+
+          let adjustedEtdDate = new Date(etdDate);
+          let etdAdjustmentNote = '';
+          if (daysDiff <= 20) {
+            adjustedEtdDate = new Date(todayDate);
+            adjustedEtdDate.setDate(todayDate.getDate() + preparationTime);
+            etdAdjustmentNote = `${translations[language].noteETDAdjusted}${formatDate(adjustedEtdDate)}.`;
+          }
+
+          const totalDays = transitTime;
+          const etaDate = new Date(adjustedEtdDate);
+          etaDate.setDate(adjustedEtdDate.getDate() + totalDays);
+
+          const formattedEtd = formatDate(adjustedEtdDate);
+          const formattedEta = formatDate(etaDate);
+
+          let resultObj = {
+            message: translations[language].resultMessage
+              .replace('<date>', `<strong style="color: #3B82F6">${formattedEtd}</strong>`)
+              .replace('<pod>', `<strong style="color: #10B981">${pod}, ${country.toUpperCase()}</strong>`)
+              .replace('<eta>', `<strong style="color: #3B82F6">${formattedEta}</strong>`),
+            summary: {
+              etd: formattedEtd,
+              pod: `${pod}, ${country.toUpperCase()}`,
+              preparationTime: daysDiff <= 20 ? `${preparationTime} days` : "0 days",
+              transitTime: `${transitTime} days`,
+              eta: formattedEta,
+            },
+            notes: []
+          };
+
+          if (etdAdjustmentNote && !resultObj.notes.some(note => note.text === etdAdjustmentNote)) {
+            resultObj.notes.push({ text: etdAdjustmentNote, id: 1 });
+          }
+
+          if (unitPrice) {
+            let unitPriceValue = parseInt(unitPrice, 10);
+            const portAdditionalPrice = selectedPort.additionalPrice === "Spot" ? 0 : parseInt(selectedPort.additionalPrice, 10);
+            let bagAdditionalPrice = 0;
+            let bagNote = '';
+
+            if (smallBags20kg) {
+              bagAdditionalPrice = 15;
+              bagNote = translations[language].noteSmallBags20kg;
+            } else if (smallBagsKraft) {
+              bagAdditionalPrice = 25;
+              bagNote = translations[language].noteSmallBagsKraft;
+            }
+
+            const finalPrice = unitPriceValue + portAdditionalPrice + bagAdditionalPrice;
+
+            resultObj = {
+              message: translations[language].resultMessageWithPrice
+                .replace('<date>', `<strong style="color: #3B82F6">${formattedEtd}</strong>`)
+                .replace('<pod>', `<strong style="color: #10B981">${pod}, ${country.toUpperCase()}</strong>`)
+                .replace('<eta>', `<strong style="color: #3B82F6">${formattedEta}</strong>`)
+                .replace('<price>', `<strong style="color: #9333EA">${formatNumber(finalPrice)}</strong>`),
+              summary: {
+                etd: formattedEtd,
+                pod: `${pod}, ${country.toUpperCase()}`,
+                preparationTime: daysDiff <= 20 ? `${preparationTime} days` : "0 days",
+                transitTime: `${transitTime} days`,
+                eta: formattedEta,
+                unitPrice: `USD ${formatNumber(unitPriceValue)} USD/MT`,
+                portAdditionalPrice: selectedPort.additionalPrice === "Spot" ? "Spot" : `USD ${formatNumber(portAdditionalPrice)} USD/MT`,
+                bagAdditionalPrice: bagAdditionalPrice ? `USD ${formatNumber(bagAdditionalPrice)} USD/MT` : null,
+                finalPrice: `USD ${formatNumber(finalPrice)} USD/MT`
+              },
+              notes: resultObj.notes // Preserve existing notes
+            };
+
+            if (etdAdjustmentNote && !resultObj.notes.some(note => note.text === etdAdjustmentNote)) {
+              resultObj.notes.push({ text: etdAdjustmentNote, id: 1 });
+            }
+            if (bagNote && !resultObj.notes.some(note => note.text === bagNote)) {
+              resultObj.notes.push({ text: bagNote, id: resultObj.notes.length + 1 });
+            } else if (selectedPort.additionalPrice === "Spot" && !resultObj.notes.some(note => note.text.includes("Spot"))) {
+              resultObj.notes.push({ text: translations[language].noteSpotPrice.replace('<pod>', pod), id: resultObj.notes.length + 1 });
+            }
+          } else if (selectedPort.additionalPrice === "Spot" && !resultObj.notes.some(note => note.text.includes("Spot"))) {
+            resultObj.notes.push({ text: translations[language].noteSpotPrice.replace('<pod>', pod), id: 1 });
+          }
+
+          setResult(resultObj);
+
+          // Save to recent calculations
+          const newCalc = {
+            message: resultObj.message,
+            timestamp: new Date().toLocaleString()
+          };
+          const updatedCalcs = [newCalc, ...recentCalculations].slice(0, 5);
+          setRecentCalculations(updatedCalcs);
+          localStorage.setItem('recentCalculationsETA', JSON.stringify(updatedCalcs));
+
+          setIsLoading(false);
+        }, 500);
+      };
+
+      const copyResult = () => {
+        if (result) {
+          const summaryText = Object.entries(result.summary)
+            .filter(([key, value]) => value !== null)
+            .map(([key, value]) => `${translations[language][key] || key}: ${value}`)
+            .join('\n');
+          const textToCopy = `${result.message.replace(/<[^>]+>/g, '')}\n\n${summaryText}`;
+          navigator.clipboard.writeText(textToCopy)
+            .then(() => alert('Result copied to clipboard!'))
+            .catch(err => console.error('Failed to copy text: ', err));
+        }
+      };
+
+      // Render calculator by default with English
+      return (
+        <div className="bg-gray-200 min-h-screen flex items-center justify-center p-4 relative">
+          <div className="app-container bg-white shadow-lg rounded-lg">
+            <div className="p-8 relative">
+              <div className="absolute top-2 left-4 text-sm text-gray-600 font-medium" style={{ color: '#1E3A8A' }}>
+                {formatTimeWithSeconds(currentTime)} | {currentTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} | GMT+08
+              </div>
+              <div className="absolute top-5 right-4">
+                <select
+                  className="px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                >
+                  <option value="en">English</option>
+                  <option value="zh">中文 (繁體)</option>
+                  <option value="zh-cn">中文 (简体)</option>
+                  <option value="tr">Türkçe</option>
+                  <option value="ms">Bahasa Melayu</option>
+                </select>
+              </div>
+              <div className="flex flex-col items-center mb-4">
+                <img
+                  src="https://raw.githubusercontent.com/zmyeo54/etimaden-html-share/refs/heads/main/assets/Etimaden%20For%20Life%20Logo.png"
+                  alt="Etimaden For Life Logo"
+                  className="logo-animate"
+                  style={{ width: '448px', height: '136px', marginTop: '30px', marginBottom: '50px' }}
+                />
+                <h1 className="text-3xl font-bold text-center text-blue-900 mt-[-50px]">{translations[language].title}</h1>
+              </div>
+
+              <form onSubmit={calculateETA} className="space-y-6 mt-6">
+                {/* ETD Date Picker */}
+                <div>
+                  <Tooltip text={translations[language].etdTooltip}>
+                    <label htmlFor="etd" className="block text-base font-medium text-gray-700 mb-2">
+                      {translations[language].etdLabel}
+                    </label>
+                  </Tooltip>
+                  <div className="flex space-x-2">
+                    <input
+                      id="etd"
+                      type="date"
+                      value={etd}
+                      onChange={handleEtdChange}
+                      ref={etdInputRef}
+                      className="mt-1 flex-1 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSetToday}
+                      className="mt-1 bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                    >
+                      {translations[language].todayButton}
+                    </button>
+                  </div>
+                  {errors.etd && (
+                    <div className="mt-2 flex items-center text-sm text-red-600">
+                      <AlertCircle />
+                      <span className="ml-1">{errors.etd}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Country Dropdown */}
+                <div>
+                  <Tooltip text={translations[language].countryTooltip}>
+                    <label htmlFor="country" className="block text-base font-medium text-gray-700 mb-2">
+                      {translations[language].countryLabel}
+                    </label>
+                  </Tooltip>
+                  <select
+                    id="country"
+                    value={country}
+                    onChange={handleCountryChange}
+                    className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  >
+                    <option value="">{translations[language].selectOption} {translations[language].countryLabel}</option>
+                    {uniqueCountries.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  {errors.country && (
+                    <div className="mt-2 flex items-center text-sm text-red-600">
+                      <AlertCircle />
+                      <span className="ml-1">{errors.country}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Region Dropdown (China only) */}
+                {country === "China" && (
+                  <div>
+                    <Tooltip text={translations[language].regionTooltip}>
+                      <label htmlFor="region" className="block text-base font-medium text-gray-700 mb-2">
+                        {translations[language].regionLabel}
+                      </label>
+                    </Tooltip>
+                    <select
+                      id="region"
+                      value={region}
+                      onChange={handleRegionChange}
+                      className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    >
+                      <option value="">{translations[language].selectOption} {translations[language].regionLabel}</option>
+                      {regions.map((r) => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </select>
+                    {errors.region && (
+                      <div className="mt-2 flex items-center text-sm text-red-600">
+                        <AlertCircle />
+                        <span className="ml-1">{errors.region}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* POD Dropdown */}
+                <div>
+                  <Tooltip text={translations[language].podTooltip}>
+                    <label htmlFor="pod" className="block text-base font-medium text-gray-700 mb-2">
+                      {translations[language].podLabel}
+                    </label>
+                  </Tooltip>
+                  <select
+                    id="pod"
+                    value={pod}
+                    onChange={handlePodChange}
+                    disabled={!country || (country === "China" && !region)}
+                    className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:bg-gray-100"
+                  >
+                    <option value="">{translations[language].selectOption} {translations[language].podLabel}</option>
+                    {availablePods.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                  {errors.pod && (
+                    <div className="mt-2 flex items-center text-sm text-red-600">
+                      <AlertCircle />
+                      <span className="ml-1">{errors.pod}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Price Calculator Section */}
+                <div className="mt-6 p-4 bg-white border border-gray-200 rounded-md shadow-md">
+                  <h2 className="text-xl font-bold text-gray-800 mb-0">{translations[language].priceCalculator}</h2>
+                  <p className="text-sm text-gray-600 mb-2" dangerouslySetInnerHTML={{ __html: translations[language].priceCalculatorSubheader }}></p>
+                  <div>
+                    <Tooltip text={translations[language].unitPriceTooltip}>
+                      <label htmlFor="unitPrice" className="block text-base font-medium text-gray-700 mb-2">
+                        {translations[language].unitPriceLabel}
+                      </label>
+                    </Tooltip>
+                    <input
+                      id="unitPrice"
+                      type="text"
+                      value={unitPrice}
+                      onChange={handleUnitPriceChange}
+                      onBlur={handleUnitPriceBlur}
+                      className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      placeholder="e.g., 575"
+                    />
+                    {errors.unitPrice && (
+                      <div className="mt-2 flex items-center text-sm text-red-600">
+                        <AlertCircle />
+                        <span className="ml-1">{errors.unitPrice}</span>
+                      </div>
+                    )}
+                    <div className="mt-4 space-y-2">
+                      <Tooltip text={translations[language].smallBags20kgTooltip}>
+                        <label className="flex items-center text-sm text-gray-600">
+                          <input
+                            type="checkbox"
+                            checked={smallBags20kg}
+                            onChange={handleSmallBags20kgChange}
+                            className="mr-2"
+                          />
+                          {translations[language].smallBags20kg}
+                        </label>
+                      </Tooltip>
+                      <Tooltip text={translations[language].smallBagsKraftTooltip}>
+                        <label className="flex items-center text-sm text-gray-600">
+                          <input
+                            type="checkbox"
+                            checked={smallBagsKraft}
+                            onChange={handleSmallBagsKraftChange}
+                            className="mr-2"
+                          />
+                          {translations[language].smallBagsKraft}
+                        </label>
+                      </Tooltip>
+                      {errors.smallBags && (
+                        <div className="mt-2 flex items-center text-sm text-red-600">
+                          <AlertCircle />
+                          <span className="ml-1">{errors.smallBags}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex space-x-4">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-blue-700 hover:scale-105 transform transition focus:outline-none focus:ring-2 focus:ring-blue-600 flex items-center justify-center disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Loader />}
+                    <span className={isLoading ? "ml-2" : ""}>{isLoading ? translations[language].calculating : translations[language].calculateButton}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="flex-1 bg-red-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-red-700 hover:scale-105 transform transition focus:outline-none focus:ring-2 focus:ring-red-600"
+                  >
+                    {translations[language].resetButton}
+                  </button>
+                </div>
+
+                {/* Result Display */}
+                {result && (
+                  <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-white rounded-lg shadow-md border border-blue-200">
+                    <p className="result-text text-center text-lg text-gray-800 mb-4" dangerouslySetInnerHTML={{ __html: result.message }}></p>
+                    <p> </p> {/* Empty row */}
+                    {result.notes.length > 0 && (
+                      <div className="text-left text-sm text-gray-600">
+                        {result.notes.map((note, index) => (
+                          <p key={index}>{note.text.replace(/<[^>]+>/g, '')}</p>
+                        ))}
+                      </div>
+                    )}
+                    <div className="disclaimer-section">
+                      {translations[language].disclaimer}
+                    </div>
+                  </div>
+                )}
+              </form>
+
+              {/* Summary Display */}
+              {result && (
+                <div className="mt-6">
+                  <div className="summary-section">
+                    <div className="summary-header">{translations[language].summary}</div>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-lg font-bold text-blue-800">{translations[language].shippingDetails}</h4>
+                        <div className="summary-item">
+                          <span className="summary-label">{translations[language].etd}:</span>
+                          <span className="summary-value" style={{ fontWeight: 'bold', color: '#3B82F6' }}>{result.summary.etd}</span>
+                        </div>
+                        <div className="summary-item">
+                          <span className="summary-label">{translations[language].pod}:</span>
+                          <span className="summary-value" style={{ fontWeight: 'bold', color: '#10B981' }}>{result.summary.pod}</span>
+                        </div>
+                        <div className="summary-item">
+                          <span className="summary-label">{translations[language].eta}:</span>
+                          <span className="summary-value" style={{ fontWeight: 'bold', color: '#3B82F6' }}>{result.summary.eta}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold text-blue-800">{translations[language].timing}</h4>
+                        <div className="summary-item">
+                          <span className="summary-label">{translations[language].preparationTime}:</span>
+                          <span className="summary-value">{result.summary.preparationTime}</span>
+                        </div>
+                        <div className="summary-item">
+                          <span className="summary-label">{translations[language].transitTime}:</span>
+                          <span className="summary-value">{result.summary.transitTime}</span>
+                        </div>
+                      </div>
+                      {result.summary.unitPrice && (
+                        <div>
+                          <h4 className="text-lg font-bold text-blue-800">{translations[language].pricing}</h4>
+                          <div className="summary-item">
+                            <span className="summary-label">{translations[language].unitPrice}:</span>
+                            <span className="summary-value">{result.summary.unitPrice}</span>
+                          </div>
+                          <div className="summary-item">
+                            <span className="summary-label">{translations[language].portAdditionalPrice}:</span>
+                            <span className="summary-value">{result.summary.portAdditionalPrice}</span>
+                          </div>
+                          {result.summary.bagAdditionalPrice && (
+                            <div className="summary-item">
+                              <span className="summary-label">{translations[language].bagAdditionalPrice}:</span>
+                              <span className="summary-value">{result.summary.bagAdditionalPrice}</span>
+                            </div>
+                          )}
+                          <div className="summary-item">
+                            <span className="summary-label font-bold text-lg align-bottom">{translations[language].finalPrice}:</span>
+                            <span className="summary-value final-price font-bold" style={{ color: '#9333EA' }}>{result.summary.finalPrice}</span>
+                          </div>
+                          <div className="mt-4">
+                            <button
+                              onClick={copyResult}
+                              className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
+                            >
+                              {translations[language].copyResult}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Recent Results */}
+              {recentCalculations.length > 0 && (
+                <div className="mt-8">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold text-gray-700">{language === 'ms' ? translations[language].carianTerkini : translations[language].recentResults}</h2>
+                    <button
+                      onClick={clearHistory}
+                      className="bg-red-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm"
+                    >
+                      {translations[language].clearAll}
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {recentCalculations.map((calc, index) => (
+                      <div key={index} className="p-4 bg-gray-50 rounded-md text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: calc.message }} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          {showWelcome && (
+            <div className="modal">
+              <div className="modal-content">
+                <span className="close-button" onClick={() => setShowWelcome(false)}>×</span>
+                <h2 className="text-2xl font-bold text-blue-900 mb-4">{translations[language || 'en'].welcomeTitle}</h2>
+                <div className="text-gray-700 mb-6">
+                  <p>{translations[language || 'en'].welcomeMessage}</p>
+                  <p> </p> {/* Empty row */}
+                  <p dangerouslySetInnerHTML={{ __html: translations[language || 'en'].welcomeInstruction2 }}></p>
+                </div>
+                <select
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-lg"
+                  onChange={(e) => setLanguage(e.target.value)}
+                  value={language || ''}
+                >
+                  <option value="" disabled>Select Language</option>
+                  <option value="en">English</option>
+                  <option value="zh">中文 (繁體)</option>
+                  <option value="zh-cn">中文 (简体)</option>
+                  <option value="tr">Türkçe</option>
+                  <option value="ms">Bahasa Melayu</option>
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    // Render the app
+    try {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<ETACalculator />);
+    } catch (error) {
+      console.error('Error rendering React app:', error);
+    }
+  </script>
+</body>
+</html>
