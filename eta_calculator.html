@@ -967,10 +967,15 @@
                   <option value="ms">Bahasa Melayu</option>
                 </select>
               </div>
-              <div className="flex flex-col items-center mb-8">
-               <img src="https://raw.githubusercontent.com/zmyeo54/etimaden-html-share/refs/heads/main/assets/Etimaden%20For%20Life%20Logo.png" alt="Etimaden For Life Logo" class="h-25 logo-animate">
-                <h1 className="text-3xl font-bold text-center text-blue-900 mt-[-50px]">{translations[language].title}</h1>
-              </div>
+<div className="flex flex-col items-center mb-8">
+  <img 
+    src="https://raw.githubusercontent.com/zmyeo54/etimaden-html-share/refs/heads/main/assets/Etimaden%20For%20Life%20Logo.png" 
+    alt="Etimaden For Life" 
+    className="h-25 logo-animate" 
+    style={{ marginTop: '30px', marginBottom: '50px' }} // Added inline styles for margin
+  />
+  <h1 className="text-3xl font-bold text-center text-blue-900 mt-[-50px]">{translations[language].title}</h1>
+</div>
 
               <form onSubmit={calculateETA} className="space-y-6 mt-6">
                 {/* ETD Date Picker */}
