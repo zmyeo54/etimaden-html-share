@@ -72,7 +72,7 @@
     }
     
     .tooltip:hover .tooltip-text {
-      visibility: visible;
+      visibility: hidden;
       opacity: 1;
     }
     
@@ -605,7 +605,7 @@
 
     // Main component
     const ETACalculator = () => {
-      const today = new Date('2025-06-20T18:39:00+08:00').toISOString().split('T')[0]; // Updated to 06:39 PM HKT
+      const today = new Date().toISOString().split('T')[0]; // Dynamic current date
       const [etd, setEtd] = React.useState(today);
       const [country, setCountry] = React.useState('');
       const [region, setRegion] = React.useState('');
@@ -625,7 +625,7 @@
       const [isLoading, setIsLoading] = React.useState(false);
       const [recentCalculations, setRecentCalculations] = React.useState([]);
       const [language, setLanguage] = React.useState('en'); // Default to English
-      const [currentTime, setCurrentTime] = React.useState(new Date('2025-06-20T18:39:00+08:00'));
+      const [currentTime, setCurrentTime] = React.useState(new Date());
       const [showWelcome, setShowWelcome] = React.useState(true);
 
       const etdInputRef = React.useRef(null);
@@ -833,7 +833,7 @@
           const transitTime = selectedPort.transitTime;
           const preparationTime = 20;
           const etdDate = new Date(etd);
-          const todayDate = new Date('2025-06-20T18:39:00+08:00'); // Updated to 06:39 PM HKT
+          const todayDate = new Date(); // Dynamic current date
           const daysDiff = getDaysDifference(todayDate, etdDate);
 
           let adjustedEtdDate = new Date(etdDate);
@@ -961,8 +961,8 @@
                   onChange={(e) => setLanguage(e.target.value)}
                 >
                   <option value="en">English</option>
-                  <option value="zh">繁体中文 (香港)</option>
-                  <option value="zh-cn">简体中文 (中国大陆)</option>
+                  <option value="zh">中文 (香港)</option>
+                  <option value="zh-cn">中文 (简体)</option>
                   <option value="tr">Türkçe</option>
                   <option value="ms">Bahasa Melayu</option>
                 </select>
@@ -1293,8 +1293,8 @@
                 >
                   <option value="" disabled>Select Language</option>
                   <option value="en">English</option>
-                  <option value="zh">中文 (香港)</option>
-                  <option value="zh-cn">中文 (简体)</option>
+                  <option value="zh">繁體中文（中國香港）</option>
+                  <option value="zh-cn">简体中文（中国大陆）</option>
                   <option value="tr">Türkçe</option>
                   <option value="ms">Bahasa Melayu</option>
                 </select>
