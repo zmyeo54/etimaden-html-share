@@ -283,7 +283,7 @@
         noteSmallBags20kg: "<br>❖ Small bags - 20kg/25kg FFS/Laminated PP adds USD 15/MT.",
         noteSmallBagsKraft: "<br>❖ Small bags - 20kg/25kg Kraft adds USD 25/MT.",
         noteSpotPrice: "Port additional price is 'Spot' for <pod>, treated as USD 0 USD/MT.",
-        disclaimer: "Disclaimer: The Estimated Date of Departure (ETD) and Estimated Time of Arrival (ETA) dates are based on the entry of the order into the Online Order system as of Friday, June 20, 2025. These dates are subject to change based on operational conditions.",
+        disclaimer: "Disclaimer: The Estimated Date of Departure (ETD) and Estimated Time of Arrival (ETA) dates are based on the entry of the order into the Online Order system as of <currentdatetime>. These dates are subject to change based on operational conditions.",
         copyResult: "Copy Result"
       },
       zh: {
@@ -334,7 +334,7 @@
         noteSmallBags20kg: "<br>❖ 小袋 - 20公斤/25公斤 FFS/Laminated PP 每公噸增加 USD 15。",
         noteSmallBagsKraft: "<br>❖ 小袋 - 20公斤/25公斤 Kraft 每公噸增加 USD 25。",
         noteSpotPrice: "港口額外價格為 '<pod>' 嘅 '即時價格'，視為 USD 0 USD/公噸。",
-        disclaimer: "免責聲明：預計離港日期 (ETD) 同預計抵港時間 (ETA) 日期基於訂單於 2025 年 6 月 20 日星期五進入線上訂單系統嘅數據。呢啲日期可能會因運營條件而變更。",
+        disclaimer: "免責聲明：預計離港日期 (ETD) 同預計抵港時間 (ETA) 日期基於訂單於 <currentdatetime> 進入線上訂單系統嘅數據。呢啲日期可能會因運營條件而變更。",
         copyResult: "複製結果"
       },
       "zh-cn": {
@@ -385,7 +385,7 @@
         noteSmallBags20kg: "<br>❖ 小袋 - 20公斤/25公斤 FFS/Laminated PP 每公吨增加 USD 15。",
         noteSmallBagsKraft: "<br>❖ 小袋 - 20公斤/25公斤 Kraft 每公吨增加 USD 25。",
         noteSpotPrice: "港口额外价格为 '<pod>' 的 '即时价格'，视为 USD 0 USD/公吨。",
-        disclaimer: "免责声明：预计离港日期 (ETD) 及预计抵港时间 (ETA) 日期基于订单于 2025 年 6 月 20 日星期五进入在线订单系统的记录。这些日期可能因运营条件而更改。",
+        disclaimer: "免责声明：预计离港日期 (ETD) 及预计抵港时间 (ETA) 日期基于订单于 <currentdatetime> 进入在线订单系统的记录。这些日期可能因运营条件而更改。",
         copyResult: "复制结果"
       },
       tr: {
@@ -436,7 +436,7 @@
         noteSmallBags20kg: "<br>❖ Küçük çantalar - 20kg/25kg FFS/Laminated PP her metrik ton için USD 15 ekler.",
         noteSmallBagsKraft: "<br>❖ Küçük çantalar - 20kg/25kg Kraft her metrik ton için USD 25 ekler.",
         noteSpotPrice: "Liman ek fiyatı '<pod>' için 'Spot' olarak belirlenmiş ve USD 0 USD/MT olarak kabul edilmiştir.",
-        disclaimer: "Sorumluluk Reddi: Tahmini Kalkış Tarihi (ETD) ve Tahmini Varış Zamanı (ETA) tarihleri, siparişin 20 Haziran 2025 Cuma günü Online Sipariş sistemine girişine dayanmaktadır. Bu tarihler, operasyonel koşullara bağlı olarak değişebilir.",
+        disclaimer: "Sorumluluk Reddi: Tahmini Kalkış Tarihi (ETD) ve Tahmini Varış Zamanı (ETA) tarihleri, siparişin <currentdatetime> tarihinde Online Sipariş sistemine girişine dayanmaktadır. Bu tarihler, operasyonel koşullara bağlı olarak değişebilir.",
         copyResult: "Sonucu Kopyala"
       },
       ms: {
@@ -487,7 +487,7 @@
         noteSmallBags20kg: "<br>❖ Beg kecil - 20kg/25kg FFS/Laminated PP menambah USD 15 setiap tan metrik.",
         noteSmallBagsKraft: "<br>❖ Beg kecil - 20kg/25kg Kraft menambah USD 25 setiap tan metrik.",
         noteSpotPrice: "Harga tambahan pelabuhan adalah 'Spot' untuk <pod>, dirawat sebagai USD 0 USD/MT.",
-        disclaimer: "Penafian: Tarikh Berlepas Anggaran (ETD) dan Tarikh Ketibaan Jangkaan (ETA) berdasarkan entri pesanan ke dalam sistem Pesanan Dalam Talian pada Jumaat, 20 Jun 2025. Tarikh-tarikh ini tertakluk kepada perubahan berdasarkan keadaan operasi.",
+        disclaimer: "Penafian: Tarikh Berlepas Anggaran (ETD) dan Tarikh Ketibaan Jangkaan (ETA) berdasarkan entri pesanan ke dalam sistem Pesanan Dalam Talian pada <currentdatetime>. Tarikh-tarikh ini tertakluk kepada perubahan berdasarkan keadaan operasi.",
         copyResult: "Salin Keputusan"
       }
     };
@@ -574,6 +574,19 @@
       const ampm = hours >= 12 ? 'PM' : 'AM';
       const formattedHours = hours % 12 || 12;
       return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${ampm}`;
+    };
+
+    const formatFullDateTime = (date) => {
+      return date.toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Hong_Kong'
+      }) + ' HKT';
     };
 
     const getDaysDifference = (date1, date2) => {
@@ -961,8 +974,8 @@
                   onChange={(e) => setLanguage(e.target.value)}
                 >
                   <option value="en">English</option>
-                  <option value="zh">繁體中文（中國香港）</option>
-                  <option value="zh-cn">简体中文（中国大陆）</option>
+                  <option value="zh">中文 (香港)</option>
+                  <option value="zh-cn">中文 (简体)</option>
                   <option value="tr">Türkçe</option>
                   <option value="ms">Bahasa Melayu</option>
                 </select>
@@ -1181,7 +1194,7 @@
                       </div>
                     )}
                     <div className="disclaimer-section">
-                      {translations[language].disclaimer}
+                      {translations[language].disclaimer.replace('<currentdatetime>', formatFullDateTime(currentTime))}
                     </div>
                   </div>
                 )}
@@ -1293,8 +1306,8 @@
                 >
                   <option value="" disabled>Select Language</option>
                   <option value="en">English</option>
-                  <option value="zh">繁體中文（中國香港）</option>
-                  <option value="zh-cn">简体中文（中国大陆）</option>
+                  <option value="zh">中文 (香港)</option>
+                  <option value="zh-cn">中文 (简体)</option>
                   <option value="tr">Türkçe</option>
                   <option value="ms">Bahasa Melayu</option>
                 </select>
