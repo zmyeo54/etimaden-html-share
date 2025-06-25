@@ -60,6 +60,11 @@
       min-width: 0;
     }
     
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
     .tooltip .tooltip-text::after {
       content: "";
       position: absolute;
@@ -69,11 +74,6 @@
       border-width: 5px;
       border-style: solid;
       border-color: #1E3A8A transparent transparent transparent;
-    }
-    
-    .tooltip:hover .tooltip-text {
-      visibility: hidden;
-      opacity: 1;
     }
     
     .animate-spin {
@@ -197,6 +197,15 @@
       text-align: left;
     }
     
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    .blink {
+      animation: blink 1s step-end infinite;
+      color: red;
+      font-weight: bold;
+    }
+    
     @media (max-width: 640px) {
       .app-container {
         padding: 1rem;
@@ -233,15 +242,14 @@
   <div id="root"></div>
   
   <script type="text/babel">
-    // Language translations
     const translations = {
       en: {
         title: "ETA Calculator",
         welcomeTitle: "Welcome to ETA Calculator",
-        welcomeMessage: "We are delighted to have you here! The ETA Calculator helps you estimate the Estimated Date of Departure (ETD) based on the Expected Time of Arrival (ETA), destination country, port of discharge, and optional pricing details.",
+        welcomeMessage: "We are pleased to welcome you to the ETA Calculator, a tool designed to determine the Estimated Date of Departure (ETD) based on the Required Date of Arrival (ETA), destination country, port of discharge, and optional pricing details. This application ensures accurate scheduling and cost estimation for your shipments.",
         welcomeInstruction2: "<br><ul><li>Please select your preferred language to proceed.</li></ul>",
-        etaLabel: "Expected Time of Arrival (ETA)",
-        etaTooltip: "Select the expected arrival date",
+        etaLabel: "Required Date of Arrival (ETA)",
+        etaTooltip: "Select the required arrival date",
         todayButton: "Today",
         countryLabel: "Country",
         countryTooltip: "Select the destination country",
@@ -265,11 +273,11 @@
         summary: "Summary",
         priceCalculator: "Price Calculator",
         priceCalculatorSubheader: "<i>Optional - proceed without this if ETD alone suffices</i>",
-        etd: "ETD",
+        etd: "Estimated Date of Departure (ETD)",
         pod: "Port of Discharge",
-        preparationTime: "Preparation Time",
+        preparationTime: "Preparation Time Needed",
         transitTime: "Transit Time",
-        eta: "ETA",
+        eta: "Required Date of Arrival (ETA)",
         unitPrice: "Unit Price",
         portAdditionalPrice: "Port Additional Price",
         bagAdditionalPrice: "Bag Additional Price",
@@ -277,22 +285,23 @@
         shippingDetails: "Shipping Details",
         timing: "Time Taken",
         pricing: "Pricing",
-        resultMessage: "The shipment is expected to arrive (ETA) at <pod> on <eta>, with an Estimated Date of Departure (ETD) of <date>",
-        resultMessageWithPrice: "The shipment is expected to arrive (ETA) at <pod> on <eta>, with an Estimated Date of Departure (ETD) of <date> and a final price of <price> USD/MT",
-        noteETAAdjusted: "❖ The initial ETA was too early, not providing the required 20 days preparation time plus transit time. The new ETA is adjusted to ",
+        resultMessage: "The shipment is scheduled to arrive at <pod> on the Required Date of Arrival (ETA) <eta>, with an Estimated Date of Departure (ETD) of <date>.",
+        resultMessageWithPrice: "The shipment is scheduled to arrive at <pod> on the Required Date of Arrival (ETA) <eta>, with an Estimated Date of Departure (ETD) of <date> and a total price of <price> USD/MT.",
+        noteETAAdjusted: "❖ The initial Required Date of Arrival (ETA) was set too early, not allowing the required preparation time plus transit time with an ETD at least 20 days from today. The adjusted Required Date of Arrival (ETA) is now ",
         noteSmallBags20kg: "<br>❖ Small bags - 20kg/25kg FFS/Laminated PP adds USD 15/MT.",
         noteSmallBagsKraft: "<br>❖ Small bags - 20kg/25kg Kraft adds USD 25/MT.",
         noteSpotPrice: "Port additional price is 'Spot' for <pod>, treated as USD 0 USD/MT.",
-        disclaimer: "Disclaimer: The Estimated Date of Departure (ETD) and Estimated Time of Arrival (ETA) dates are based on the entry of the order into the Online Order system as of <currentdatetime>. These dates are subject to change based on operational conditions.",
-        copyResult: "Copy Result"
+        disclaimer: "Disclaimer: The Estimated Date of Departure (ETD) and Required Date of Arrival (ETA) are based on the order entry into the Online Order system as of <currentdatetime>. These dates are subject to change based on operational conditions.",
+        copyResult: "Copy Result",
+        reviseETAMessage: "<span class='blink'>We cannot process the order.</span><br> The Estimated Date of Departure (ETD) must be at least 20 days from today, which is on or after <date>. With the current Required Date of Arrival (ETA), the calculated ETD is <date>. We recommend adjusting to the earliest feasible ETA of <strong style='color: purple'><newdate></strong>."
       },
       zh: {
-        title: "預計抵港時間(ETA)計算器",
+        title: "ETA 计算器",
         welcomeTitle: "歡迎使用 ETA 計算器",
-        welcomeMessage: "我哋好開心你嚟到呢度！ETA 計算器幫你估算貨物嘅預計離港日期 (ETD)，用預計抵港時間 (ETA)、目的地國家、卸貨港同可選嘅定價細節。",
+        welcomeMessage: "我哋好開心你嚟到呢度！ETA 計算器係一個專為確定預計離港日期 (ETD) 設計嘅工具，根據要求抵港日期 (Required ETA)、目的地國家、卸貨港同可選嘅定價細節提供準確嘅運輸排期同成本估算。",
         welcomeInstruction2: "<br><ul><li>請揀選你偏好嘅語言繼續。</li></ul>",
-        etaLabel: "預計抵港時間 (ETA)",
-        etaTooltip: "揀選預計到達日期",
+        etaLabel: "要求抵港日期 (ETA)",
+        etaTooltip: "揀選要求到達日期",
         todayButton: "今日",
         countryLabel: "國家（地區）",
         countryTooltip: "揀選目的地國家",
@@ -318,9 +327,9 @@
         priceCalculatorSubheader: "<i>可選 - 如果只係要 ETD 可以唔使填寫</i>",
         etd: "預計出發時間",
         pod: "卸貨港",
-        preparationTime: "準備時間",
+        preparationTime: "所需準備時間",
         transitTime: "運輸時間",
-        eta: "預計到達時間",
+        eta: "要求抵港日期",
         unitPrice: "單位價格",
         portAdditionalPrice: "港口額外價格",
         bagAdditionalPrice: "袋子額外價格",
@@ -328,22 +337,23 @@
         shippingDetails: "運輸詳情",
         timing: "所需時間",
         pricing: "定價",
-        resultMessage: "貨物預計到達時間 (ETA) 為 <eta>，抵達 <pod>，預計出發時間 (ETD) 為 <date>",
-        resultMessageWithPrice: "貨物預計到達時間 (ETA) 為 <eta>，抵達 <pod>，預計出發時間 (ETD) 為 <date>，最終價格為 <price> 美元/公噸",
-        noteETAAdjusted: "❖ 最初嘅 ETA 時間太早，唔夠 20 日準備時間加運輸時間。新 ETA 已調整為 ",
+        resultMessage: "貨物預計於要求抵港日期 (ETA) <eta> 抵達 <pod>，預計出發時間 (ETD) 為 <date>",
+        resultMessageWithPrice: "貨物預計於要求抵港日期 (ETA) <eta> 抵達 <pod>，預計出發時間 (ETD) 為 <date>，最終價格為 <price> 美元/公噸",
+        noteETAAdjusted: "❖ 最初嘅要求抵港日期 (Required ETA) 太早，唔夠今日起至少 20 日嘅準備時間加運輸時間。新要求抵港日期已調整為 ",
         noteSmallBags20kg: "<br>❖ 小袋 - 20公斤/25公斤 FFS/Laminated PP 每公噸增加 USD 15。",
         noteSmallBagsKraft: "<br>❖ 小袋 - 20公斤/25公斤 Kraft 每公噸增加 USD 25。",
         noteSpotPrice: "港口額外價格為 '<pod>' 嘅 '即時價格'，視為 USD 0 USD/公噸。",
-        disclaimer: "免責聲明：預計離港日期 (ETD) 同預計抵港時間 (ETA) 日期基於訂單於 <currentdatetime> 進入線上訂單系統嘅數據。呢啲日期可能會因運營條件而變更。",
-        copyResult: "複製結果"
+        disclaimer: "免責聲明：預計離港日期 (ETD) 同要求抵港日期 (Required ETA) 日期基於訂單於 <currentdatetime> 進入線上訂單系統嘅數據。呢啲日期可能會因運營條件而變更。",
+        copyResult: "複製結果",
+        reviseETAMessage: "<span class='blink'>我哋無法處理呢個訂單。</span><br> 預計出發時間 (ETD) 必須至少喺今日起 20 日後，即 <date> 或之後。以目前嘅要求抵港日期 (ETA)，計算出嘅 ETD 係 <date>。請建議調整到最早嘅可能 ETA：<strong style='color: purple'><newdate></strong>。"
       },
       "zh-cn": {
-        title: "预计抵港时间(ETA)计算器",
+        title: "ETA 计算器",
         welcomeTitle: "欢迎使用 ETA 计算器",
-        welcomeMessage: "我们很高兴您来到这里！ETA 计算器帮助您估算货物的预计离港日期 (ETD)，使用预计抵港时间 (ETA)、目的地国家、卸货港以及可选的定价详情。",
+        welcomeMessage: "我们很高兴您来到这里！ETA 计算器是一个专为确定预计离港日期 (ETD) 设计的工具，根据要求抵港日期 (Required ETA)、目的地国家、卸货港以及可选的定价详情提供准确的运输排期和成本估算。",
         welcomeInstruction2: "<br><ul><li>请选择您偏好的语言以继续。</li></ul>",
-        etaLabel: "预计抵港时间 (ETA)",
-        etaTooltip: "选择预计到达日期",
+        etaLabel: "要求抵港日期 (ETA)",
+        etaTooltip: "选择要求到达日期",
         todayButton: "今天",
         countryLabel: "国家（地区）",
         countryTooltip: "选择目的地国家",
@@ -369,9 +379,9 @@
         priceCalculatorSubheader: "<i>可选 - 若仅需 ETD 则可省略此部分</i>",
         etd: "预计出发时间",
         pod: "卸货港",
-        preparationTime: "准备时间",
+        preparationTime: "所需准备时间",
         transitTime: "运输时间",
-        eta: "预计抵港时间",
+        eta: "要求抵港日期",
         unitPrice: "单位价格",
         portAdditionalPrice: "港口额外价格",
         bagAdditionalPrice: "袋子额外价格",
@@ -379,22 +389,23 @@
         shippingDetails: "运输详情",
         timing: "所需时间",
         pricing: "定价",
-        resultMessage: "货物预计抵港时间 (ETA) 为 <eta>，到达 <pod>，预计出发时间 (ETD) 为 <date>",
-        resultMessageWithPrice: "货物预计抵港时间 (ETA) 为 <eta>，到达 <pod>，预计出发时间 (ETD) 为 <date>，最终价格为 <price> 美元/公吨",
-        noteETAAdjusted: "❖ 最初的 ETA 时间过早，未能提供所需的 20 天准备时间加运输时间。新 ETA 已调整为 ",
+        resultMessage: "货物预计于要求抵港日期 (ETA) <eta> 到达 <pod>，预计出发时间 (ETD) 为 <date>",
+        resultMessageWithPrice: "货物预计于要求抵港日期 (ETA) <eta> 到达 <pod>，预计出发时间 (ETD) 为 <date>，最终价格为 <price> 美元/公吨",
+        noteETAAdjusted: "❖ 最初的要求抵港日期 (Required ETA) 过早，未能提供今日起至少 20 天所需的准备时间加运输时间。新要求抵港日期已调整为 ",
         noteSmallBags20kg: "<br>❖ 小袋 - 20公斤/25公斤 FFS/Laminated PP 每公吨增加 USD 15。",
         noteSmallBagsKraft: "<br>❖ 小袋 - 20公斤/25公斤 Kraft 每公吨增加 USD 25。",
         noteSpotPrice: "港口额外价格为 '<pod>' 的 '即时价格'，视为 USD 0 USD/公吨。",
-        disclaimer: "免责声明：预计离港日期 (ETD) 及预计抵港时间 (ETA) 日期基于订单于 <currentdatetime> 进入在线订单系统的记录。这些日期可能因运营条件而更改。",
-        copyResult: "复制结果"
+        disclaimer: "免责声明：预计离港日期 (ETD) 及要求抵港日期 (Required ETA) 日期基于订单于 <currentdatetime> 进入在线订单系统的记录。这些日期可能因运营条件而更改。",
+        copyResult: "复制结果",
+        reviseETAMessage: "<span class='blink'>我们无法处理此订单。</span><br> 预计出发时间 (ETD) 必须至少在今日起 20 天后，即 <date> 或之后。以当前要求抵港日期 (ETA)，计算出的 ETD 为 <date>。请建议调整到最早的可能 ETA：<strong style='color: purple'><newdate></strong>。"
       },
       tr: {
         title: "ETA Hesaplayıcı",
         welcomeTitle: "ETA Hesaplayıcı'ya Hoş Geldiniz",
-        welcomeMessage: "Sizi burada görmekten mutluluk duyuyoruz! ETA Hesaplayıcı, Tahmini Varış Zamanı (ETA) üzerinden Tahmini Kalkış Tarihi (ETD) tahminlerinizi kolaylaştırmak için tasarlanmış bir araçtır. Hedef ülke, boşaltma limanı ve isteğe bağlı fiyatlandırma detaylarını kullanarak tahminler yapabilirsiniz.",
+        welcomeMessage: "Sizi burada görmekten mutluluk duyuyoruz! ETA Hesaplayıcı, Gerekli Varış Tarihi (ETA) üzerinden Tahmini Kalkış Tarihi (ETD) belirlemek için tasarlanmış bir araçtır. Hedef ülke, boşaltma limanı ve isteğe bağlı fiyatlandırma detayları ile doğru planlama ve maliyet tahmini sunar.",
         welcomeInstruction2: "<br><ul><li>Lütfen devam etmek için tercih ettiğiniz dili seçin.</li></ul>",
-        etaLabel: "Tahmini Varış Zamanı (ETA)",
-        etaTooltip: "Tahmini varış tarihini seçin",
+        etaLabel: "Gerekli Varış Tarihi (ETA)",
+        etaTooltip: "Gerekli varış tarihini seçin",
         todayButton: "Bugün",
         countryLabel: "Ülke",
         countryTooltip: "Hedef ülkeyi seçin",
@@ -418,11 +429,11 @@
         summary: "Özet",
         priceCalculator: "Fiyat Hesaplayıcı",
         priceCalculatorSubheader: "<i>İsteğe bağlı - yalnızca ETD gerekiyorsa bu bölümü atlayabilirsiniz</i>",
-        etd: "ETD",
+        etd: "Tahmini Kalkış Tarihi (ETD)",
         pod: "Boşaltma Limanı",
-        preparationTime: "Hazırlık Süresi",
+        preparationTime: "Gerekli Hazırlık Süresi",
         transitTime: "Transit Süresi",
-        eta: "ETA",
+        eta: "Gerekli Varış Tarihi",
         unitPrice: "Birim Fiyat",
         portAdditionalPrice: "Liman Ek Fiyatı",
         bagAdditionalPrice: "Çanta Ek Fiyatı",
@@ -430,22 +441,23 @@
         shippingDetails: "Nakliye Detayları",
         timing: "Her Süreç İçin Geçen Zaman",
         pricing: "Fiyatlandırma",
-        resultMessage: "Sevkiyatın Tahmini Varış Zamanı (ETA) <eta> tarihinde <pod> limanına ulaşması ve Tahmini Kalkış Tarihi (ETD) <date> olması bekleniyor",
-        resultMessageWithPrice: "Sevkiyatın Tahmini Varış Zamanı (ETA) <eta> tarihinde <pod> limanına ulaşması ve Tahmini Kalkış Tarihi (ETD) <date> olması bekleniyor, nihai fiyatı <price> USD/MT",
-        noteETAAdjusted: "❖ İlk ETA süresi çok erkendi ve gerekli 20 gün hazırlık süresi ile transit süresi sağlanamadı. Yeni ETA ",
+        resultMessage: "Sevkiyatın Gerekli Varış Tarihi (ETA) <eta> tarihinde <pod> limanına ulaşması ve Tahmini Kalkış Tarihi (ETD) <date> olması bekleniyor",
+        resultMessageWithPrice: "Sevkiyatın Gerekli Varış Tarihi (ETA) <eta> tarihinde <pod> limanına ulaşması ve Tahmini Kalkış Tarihi (ETD) <date> olması bekleniyor, nihai fiyatı <price> USD/MT",
+        noteETAAdjusted: "❖ İlk Gerekli ETA süresi çok erkendi ve gerekli hazırlık süresi ile transit süresi bugün itibarıyla en az 20 gün sonra bir ETD sağlamadı. Yeni Gerekli ETA ",
         noteSmallBags20kg: "<br>❖ Küçük çantalar - 20kg/25kg FFS/Laminated PP her metrik ton için USD 15 ekler.",
         noteSmallBagsKraft: "<br>❖ Küçük çantalar - 20kg/25kg Kraft her metrik ton için USD 25 ekler.",
         noteSpotPrice: "Liman ek fiyatı '<pod>' için 'Spot' olarak belirlenmiş ve USD 0 USD/MT olarak kabul edilmiştir.",
-        disclaimer: "Sorumluluk Reddi: Tahmini Kalkış Tarihi (ETD) ve Tahmini Varış Zamanı (ETA) tarihleri, siparişin <currentdatetime> tarihinde Online Sipariş sistemine girişine dayanmaktadır. Bu tarihler, operasyonel koşullara bağlı olarak değişebilir.",
-        copyResult: "Sonucu Kopyala"
+        disclaimer: "Sorumluluk Reddi: Tahmini Kalkış Tarihi (ETD) ve Gerekli Varış Tarihi (Required ETA) tarihleri, siparişin <currentdatetime> tarihinde Online Sipariş sistemine girişine dayanmaktadır. Bu tarihler, operasyonel koşullara bağlı olarak değişebilir.",
+        copyResult: "Sonucu Kopyala",
+        reviseETAMessage: "<span class='blink'>Siparişi işleme koyamıyoruz.</span><br> Tahmini Kalkış Tarihi (ETD) bugünden itibaren en az 20 gün sonra olmalıdır, yani <date> veya sonrası. Şu anki Gerekli Varış Tarihi (ETA) ile hesaplanan ETD <date> tarihine denk geliyor. Lütfen en erken uygun ETA’yı önerin: <strong style='color: purple'><newdate></strong>."
       },
       ms: {
         title: "Kalkulator ETA",
         welcomeTitle: "Selamat Datang ke Kalkulator ETA",
-        welcomeMessage: "Kami gembira mengalu-alukan anda di sini! Kalkulator ETA membantu anda menganggarkan Tarikh Berlepas Anggaran (ETD) berdasarkan Tarikh Ketibaan Jangkaan (ETA), negara destinasi, pelabuhan pelepasan, dan butiran harga pilihan.",
+        welcomeMessage: "Kami mengalu-alukan anda dengan sukacita ke Kalkulator ETA, alat yang direka untuk menentukan Tarikh Berlepas Anggaran (ETD) berdasarkan Tarikh Ketibaan Diperlukan (ETA), negara destinasi, pelabuhan pelepasan, dan butiran harga pilihan. Aplikasi ini memastikan penjadualan dan anggaran kos yang tepat untuk penghantaran anda.",
         welcomeInstruction2: "<br><ul><li>Sila pilih bahasa yang anda inginkan untuk meneruskan.</li></ul>",
-        etaLabel: "Tarikh Ketibaan Jangkaan (ETA)",
-        etaTooltip: "Pilih tarikh ketibaan anggaran",
+        etaLabel: "Tarikh Ketibaan Diperlukan (ETA)",
+        etaTooltip: "Pilih tarikh ketibaan yang diperlukan",
         todayButton: "Hari Ini",
         countryLabel: "Negara",
         countryTooltip: "Pilih negara destinasi",
@@ -469,11 +481,11 @@
         summary: "Ringkasan",
         priceCalculator: "Kalkulator Harga",
         priceCalculatorSubheader: "<i>Pilihan - boleh dilangkau jika hanya memerlukan ETD</i>",
-        etd: "ETD",
+        etd: "Tarikh Berlepas Anggaran (ETD)",
         pod: "Pelabuhan Pelepasan",
-        preparationTime: "Masa Persiapan",
+        preparationTime: "Masa Persiapan Diperlukan",
         transitTime: "Masa Transit",
-        eta: "ETA",
+        eta: "Tarikh Ketibaan Diperlukan",
         unitPrice: "Harga Unit",
         portAdditionalPrice: "Harga Tambahan Pelabuhan",
         bagAdditionalPrice: "Harga Tambahan Beg",
@@ -481,18 +493,18 @@
         shippingDetails: "Butiran Penghantaran",
         timing: "Masa Diambil untuk Setiap Proses",
         pricing: "Penentuan Harga",
-        resultMessage: "Penghantaran dijangka tiba (ETA) di <pod> pada <eta>, dengan Tarikh Berlepas Anggaran (ETD) pada <date>",
-        resultMessageWithPrice: "Penghantaran dijangka tiba (ETA) di <pod> pada <eta>, dengan Tarikh Berlepas Anggaran (ETD) pada <date> dan harga akhir <price> USD/MT",
-        noteETAAdjusted: "❖ Tarikh ETA awal terlalu awal, tidak cukup 20 hari masa persiapan ditambah masa transit yang diperlukan. Tarikh ETA baru telah disesuaikan kepada ",
+        resultMessage: "Penghantaran dijadualkan tiba di <pod> pada Tarikh Ketibaan Diperlukan (ETA) <eta>, dengan Tarikh Berlepas Anggaran (ETD) pada <date>",
+        resultMessageWithPrice: "Penghantaran dijadualkan tiba di <pod> pada Tarikh Ketibaan Diperlukan (ETA) <eta>, dengan Tarikh Berlepas Anggaran (ETD) pada <date> dan harga akhir <price> USD/MT",
+        noteETAAdjusted: "❖ Tarikh Ketibaan Diperlukan (Required ETA) awal terlalu awal, tidak cukup masa persiapan ditambah masa transit dengan Tarikh Berlepas Anggaran (ETD) sekurang-kurangnya 20 hari dari hari ini. Tarikh Ketibaan Diperlukan baru telah disesuaikan kepada ",
         noteSmallBags20kg: "<br>❖ Beg kecil - 20kg/25kg FFS/Laminated PP menambah USD 15 setiap tan metrik.",
         noteSmallBagsKraft: "<br>❖ Beg kecil - 20kg/25kg Kraft menambah USD 25 setiap tan metrik.",
         noteSpotPrice: "Harga tambahan pelabuhan adalah 'Spot' untuk <pod>, dirawat sebagai USD 0 USD/MT.",
-        disclaimer: "Penafian: Tarikh Berlepas Anggaran (ETD) dan Tarikh Ketibaan Jangkaan (ETA) berdasarkan entri pesanan ke dalam sistem Pesanan Dalam Talian pada <currentdatetime>. Tarikh-tarikh ini tertakluk kepada perubahan berdasarkan keadaan operasi.",
-        copyResult: "Salin Keputusan"
+        disclaimer: "Penafian: Tarikh Berlepas Anggaran (ETD) dan Tarikh Ketibaan Diperlukan (Required ETA) berdasarkan entri pesanan ke dalam sistem Pesanan Dalam Talian pada <currentdatetime>. Tarikh-tarikh ini tertakluk kepada perubahan berdasarkan keadaan operasi.",
+        copyResult: "Salin Keputusan",
+        reviseETAMessage: "<span class='blink'>Kami tidak dapat memproses pesanan ini.</span><br> Tarikh Berlepas Anggaran (ETD) mesti sekurang-kurangnya 20 hari dari hari ini, iaitu pada atau selepas <date>. Dengan Tarikh Ketibaan Diperlukan (ETA) semasa, Tarikh Berlepas Anggaran (ETD) yang dikira ialah <date>. Sila cadangkan penyesuaian ke Tarikh Ketibaan Diperlukan (ETA) paling awal yang mungkin: <strong style='color: purple'><newdate></strong>."
       }
     };
 
-    // Port data
     const portsData = [
       { pod: "Chattogram", additionalPrice: 0, transitTime: 65, country: "Bangladesh", region: "Bangladesh" },
       { pod: "Anqing", additionalPrice: 8, transitTime: 60, country: "China", region: "South" },
@@ -557,7 +569,6 @@
       { pod: "Ho Chi Minh City Port", additionalPrice: 0, transitTime: 50, country: "Vietnam", region: "Vietnam" },
     ];
 
-    // Utility functions
     const formatNumber = (num, decimals = 0) => {
       if (isNaN(num)) return "0";
       return Math.round(Number(num)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -594,7 +605,18 @@
       return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     };
 
-    // Tooltip component
+    const addDays = (date, days) => {
+      const result = new Date(date);
+      result.setDate(result.getDate() + days);
+      return result;
+    };
+
+    const subtractDays = (date, days) => {
+      const result = new Date(date);
+      result.setDate(result.getDate() - days);
+      return result;
+    };
+
     const Tooltip = ({ children, text }) => (
       <div className="tooltip">
         {children}
@@ -602,7 +624,6 @@
       </div>
     );
 
-    // Icons
     const AlertCircle = () => (
       <svg className="w-4 h-6" fill="black" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -616,10 +637,11 @@
       </svg>
     );
 
-    // Main component
     const ETACalculator = () => {
-      const today = new Date().toISOString().split('T')[0]; // Dynamic current date
-      const [eta, setEta] = React.useState(today);
+      const today = new Date("2025-06-25T16:35:00+08:00"); // Updated to 04:35 PM HKT on June 25, 2025
+      const defaultEtaDate = new Date(today);
+      defaultEtaDate.setDate(today.getDate() + 80); // Set default ETA to 80 days from today
+      const [eta, setEta] = React.useState(defaultEtaDate.toISOString().split('T')[0]);
       const [country, setCountry] = React.useState('');
       const [region, setRegion] = React.useState('');
       const [pod, setPod] = React.useState('');
@@ -637,13 +659,12 @@
       });
       const [isLoading, setIsLoading] = React.useState(false);
       const [recentCalculations, setRecentCalculations] = React.useState([]);
-      const [language, setLanguage] = React.useState('en'); // Default to English
-      const [currentTime, setCurrentTime] = React.useState(new Date());
+      const [language, setLanguage] = React.useState('en');
+      const [currentTime, setCurrentTime] = React.useState(today);
       const [showWelcome, setShowWelcome] = React.useState(true);
 
       const etaInputRef = React.useRef(null);
 
-      // Update time every second
       React.useEffect(() => {
         const timer = setInterval(() => {
           setCurrentTime(new Date());
@@ -651,19 +672,13 @@
         return () => clearInterval(timer);
       }, []);
 
-      // Get unique countries
       const uniqueCountries = [...new Set(portsData.map(p => p.country))].sort();
-
-      // Get regions for China
       const regions = ["North", "South"];
-
-      // Get available PODs based on country and region
       const availablePods = portsData
         .filter(p => p.country === country && (country !== "China" || p.region === region))
         .map(p => p.pod)
         .sort();
 
-      // Load recent calculations from local storage
       React.useEffect(() => {
         const saved = localStorage.getItem('recentCalculationsETA');
         if (saved) {
@@ -671,7 +686,6 @@
         }
       }, []);
 
-      // Focus ETA input on mount
       React.useEffect(() => {
         etaInputRef.current?.focus();
       }, [language]);
@@ -694,7 +708,7 @@
       };
 
       const handleSetToday = () => {
-        setEta(today);
+        setEta(today.toISOString().split('T')[0]);
         setResult(null);
         clearErrors();
       };
@@ -766,7 +780,7 @@
       };
 
       const handleReset = () => {
-        setEta(today);
+        setEta(defaultEtaDate.toISOString().split('T')[0]);
         setCountry('');
         setRegion('');
         setPod('');
@@ -792,7 +806,7 @@
           let hasError = false;
 
           if (!eta) {
-            newErrors.eta = "Please select an arrival date.";
+            newErrors.eta = "Please select a required arrival date.";
             hasError = true;
           }
 
@@ -846,26 +860,30 @@
           const transitTime = selectedPort.transitTime;
           const preparationTime = 20;
           const etaDate = new Date(eta);
-          const todayDate = new Date(); // Dynamic current date
-          const totalLeadTime = preparationTime + transitTime;
-          const etdDate = new Date(etaDate);
-          etdDate.setDate(etaDate.getDate() - totalLeadTime);
+          etaDate.setHours(0, 0, 0, 0);
+          const calculatedEtd = subtractDays(etaDate, transitTime);
+          const earliestEtd = addDays(today, preparationTime);
+          earliestEtd.setHours(0, 0, 0, 0);
 
-          let adjustedEtaDate = new Date(etaDate);
-          let etaAdjustmentNote = '';
-          if (getDaysDifference(todayDate, etdDate) < 0) {
-            adjustedEtaDate = new Date(todayDate);
-            adjustedEtaDate.setDate(todayDate.getDate() + totalLeadTime);
-            etaAdjustmentNote = `${translations[language].noteETAAdjusted}${formatDate(adjustedEtaDate)}.`;
-            etdDate.setDate(adjustedEtaDate.getDate() - totalLeadTime);
+          let resultObj;
+          let reviseETAMessage = '';
+
+          if (calculatedEtd < earliestEtd) {
+            const earliestEta = addDays(earliestEtd, transitTime);
+            reviseETAMessage = translations[language].reviseETAMessage
+              .replace(/<date>/g, formatDate(earliestEtd))
+              .replace('<newdate>', formatDate(earliestEta));
+            setResult({ message: reviseETAMessage, summary: {}, notes: [] });
+            setIsLoading(false);
+            return;
           }
 
-          const formattedEta = formatDate(adjustedEtaDate);
-          const formattedEtd = formatDate(etdDate);
+          const formattedEta = formatDate(etaDate);
+          const formattedEtd = formatDate(calculatedEtd);
 
-          let resultObj = {
+          resultObj = {
             message: translations[language].resultMessage
-              .replace('<eta>', `<strong style="color: #3B82F6">${formattedEta}</strong>`)
+              .replace('<eta>', `<strong style="color: #808080">${formattedEta}</strong>`)
               .replace('<pod>', `<strong style="color: #10B981">${pod}, ${country.toUpperCase()}</strong>`)
               .replace('<date>', `<strong style="color: #3B82F6">${formattedEtd}</strong>`),
             summary: {
@@ -877,10 +895,6 @@
             },
             notes: []
           };
-
-          if (etaAdjustmentNote && !resultObj.notes.some(note => note.text === etaAdjustmentNote)) {
-            resultObj.notes.push({ text: etaAdjustmentNote, id: 1 });
-          }
 
           if (unitPrice) {
             let unitPriceValue = parseInt(unitPrice, 10);
@@ -900,7 +914,7 @@
 
             resultObj = {
               message: translations[language].resultMessageWithPrice
-                .replace('<eta>', `<strong style="color: #3B82F6">${formattedEta}</strong>`)
+                .replace('<eta>', `<strong style="color: #808080">${formattedEta}</strong>`)
                 .replace('<pod>', `<strong style="color: #10B981">${pod}, ${country.toUpperCase()}</strong>`)
                 .replace('<date>', `<strong style="color: #3B82F6">${formattedEtd}</strong>`)
                 .replace('<price>', `<strong style="color: #9333EA">${formatNumber(finalPrice)}</strong>`),
@@ -915,12 +929,9 @@
                 bagAdditionalPrice: bagAdditionalPrice ? `USD ${formatNumber(bagAdditionalPrice)} USD/MT` : null,
                 finalPrice: `USD ${formatNumber(finalPrice)} USD/MT`
               },
-              notes: resultObj.notes // Preserve existing notes
+              notes: resultObj.notes
             };
 
-            if (etaAdjustmentNote && !resultObj.notes.some(note => note.text === etaAdjustmentNote)) {
-              resultObj.notes.push({ text: etaAdjustmentNote, id: 1 });
-            }
             if (bagNote && !resultObj.notes.some(note => note.text === bagNote)) {
               resultObj.notes.push({ text: bagNote, id: resultObj.notes.length + 1 });
             } else if (selectedPort.additionalPrice === "Spot" && !resultObj.notes.some(note => note.text.includes("Spot"))) {
@@ -932,7 +943,6 @@
 
           setResult(resultObj);
 
-          // Save to recent calculations
           const newCalc = {
             message: resultObj.message,
             timestamp: new Date().toLocaleString()
@@ -958,7 +968,6 @@
         }
       };
 
-      // Render calculator by default with English
       return (
         <div className="bg-gray-200 min-h-screen flex items-center justify-center p-4 relative">
           <div className="app-container bg-white shadow-lg rounded-lg">
@@ -979,18 +988,16 @@
                   <option value="ms">Bahasa Melayu</option>
                 </select>
               </div>
-<div className="flex flex-col items-center mb-8">
-  <img 
-    src="https://raw.githubusercontent.com/zmyeo54/etimaden-html-share/refs/heads/main/assets/Etimaden%20For%20Life%20Logo.png" 
-    alt="Etimaden For Life" 
-    className="h-25 logo-animate" 
-    style={{ marginTop: '30px', marginBottom: '50px' }} // Added inline styles for margin
-  />
-  <h1 className="text-3xl font-bold text-center text-blue-900 mb-[-10px] mt-[-50px]">{translations[language].title}</h1>
-</div>
-
+              <div className="flex flex-col items-center mb-8">
+                <img 
+                  src="https://raw.githubusercontent.com/zmyeo54/etimaden-html-share/refs/heads/main/assets/Etimaden%20For%20Life%20Logo.png" 
+                  alt="Etimaden For Life" 
+                  className="h-25 logo-animate" 
+                  style={{ marginTop: '30px', marginBottom: '50px' }}
+                />
+                <h1 className="text-3xl font-bold text-center text-blue-900 mb-[-10px] mt-[-50px]">ETA Calculator</h1>
+              </div>
               <form onSubmit={calculateETA} className="space-y-6 mt-6">
-                {/* ETA Date Picker */}
                 <div>
                   <Tooltip text={translations[language].etaTooltip}>
                     <label htmlFor="eta" className="block text-base font-medium text-gray-700 mb-2">
@@ -1021,8 +1028,6 @@
                     </div>
                   )}
                 </div>
-
-                {/* Country Dropdown */}
                 <div>
                   <Tooltip text={translations[language].countryTooltip}>
                     <label htmlFor="country" className="block text-base font-medium text-gray-700 mb-2">
@@ -1047,8 +1052,6 @@
                     </div>
                   )}
                 </div>
-
-                {/* Region Dropdown (China only) */}
                 {country === "China" && (
                   <div>
                     <Tooltip text={translations[language].regionTooltip}>
@@ -1075,8 +1078,6 @@
                     )}
                   </div>
                 )}
-
-                {/* POD Dropdown */}
                 <div>
                   <Tooltip text={translations[language].podTooltip}>
                     <label htmlFor="pod" className="block text-base font-medium text-gray-700 mb-2">
@@ -1102,8 +1103,6 @@
                     </div>
                   )}
                 </div>
-
-                {/* Price Calculator Section */}
                 <div className="mt-6 p-4 bg-white border border-gray-200 rounded-md shadow-md">
                   <h2 className="text-xl font-bold text-gray-800 mb-0">{translations[language].priceCalculator}</h2>
                   <p className="text-sm text-gray-600 mb-2" dangerouslySetInnerHTML={{ __html: translations[language].priceCalculatorSubheader }}></p>
@@ -1160,8 +1159,6 @@
                     </div>
                   </div>
                 </div>
-
-                {/* Buttons */}
                 <div className="flex space-x-4">
                   <button
                     type="submit"
@@ -1179,12 +1176,9 @@
                     {translations[language].resetButton}
                   </button>
                 </div>
-
-                {/* Result Display */}
                 {result && (
                   <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-white rounded-lg shadow-md border border-blue-200">
                     <p className="result-text text-center text-lg text-gray-800 mb-4" dangerouslySetInnerHTML={{ __html: result.message }}></p>
-                    <p> </p> {/* Empty row */}
                     {result.notes.length > 0 && (
                       <div className="text-left text-sm text-gray-600">
                         {result.notes.map((note, index) => (
@@ -1198,9 +1192,7 @@
                   </div>
                 )}
               </form>
-
-              {/* Summary Display */}
-              {result && (
+              {result && !result.message.includes(translations[language].reviseETAMessage) && (
                 <div className="mt-6">
                   <div className="summary-section">
                     <div className="summary-header">{translations[language].summary}</div>
@@ -1209,7 +1201,7 @@
                         <h4 className="text-lg font-bold text-blue-800">{translations[language].shippingDetails}</h4>
                         <div className="summary-item">
                           <span className="summary-label">{translations[language].eta}:</span>
-                          <span className="summary-value" style={{ fontWeight: 'bold', color: '#3B82F6' }}>{result.summary.eta}</span>
+                          <span className="summary-value" style={{ fontWeight: 'bold', color: '#808080' }}>{result.summary.eta}</span>
                         </div>
                         <div className="summary-item">
                           <span className="summary-label">{translations[language].pod}:</span>
@@ -1266,69 +1258,33 @@
                   </div>
                 </div>
               )}
-
-              {/* Recent Results */}
               {recentCalculations.length > 0 && (
                 <div className="mt-8">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-semibold text-gray-700">{language === 'ms' ? translations[language].carianTerkini : translations[language].recentResults}</h2>
                     <button
                       onClick={clearHistory}
-                      className="bg-red-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm"
+                      className="text-sm text-white font-semibold py-2 px-3 rounded-md bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600"
                     >
                       {translations[language].clearAll}
                     </button>
                   </div>
                   <div className="space-y-2">
                     {recentCalculations.map((calc, index) => (
-                      <div key={index} className="p-4 bg-gray-50 rounded-md text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: calc.message }} />
+                      <div key={index} className="p-2 bg-gray-100 rounded-md text-sm">
+                        <span dangerouslySetInnerHTML={{ __html: calc.message }} /> <br /> <span className="text-xs text-gray-500">{calc.timestamp}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
             </div>
           </div>
-          {showWelcome && (
-            <div className="modal">
-              <div className="modal-content">
-                <span className="close-button" onClick={() => setShowWelcome(false)}>×</span>
-                <h2 className="text-2xl font-bold text-blue-900 mb-4">{translations[language || 'en'].welcomeTitle}</h2>
-                <div className="text-gray-700 mb-6">
-                  <p>{translations[language || 'en'].welcomeMessage}</p>
-                  <p> </p> {/* Empty row */}
-                  <p dangerouslySetInnerHTML={{ __html: translations[language || 'en'].welcomeInstruction2 }}></p>
-                </div>
-                <select
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-lg"
-                  onChange={(e) => setLanguage(e.target.value)}
-                  value={language || ''}
-                >
-                  <option value="" disabled>Select Language</option>
-                  <option value="en">English</option>
-                  <option value="zh">繁體中文（中國香港）</option>
-                  <option value="zh-cn">简体中文（中国大陆）</option>
-                  <option value="tr">Türkçe</option>
-                  <option value="ms">Bahasa Melayu</option>
-                </select>
-              </div>
-            </div>
-          )}
         </div>
       );
     };
 
-    // Disable right-click context menu
-    document.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-    });
-
-    // Render the app
-    try {
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(<ETACalculator />);
-    } catch (error) {
-      console.error('Error rendering React app:', error);
-    }
+    ReactDOM.render(<ETACalculator />, document.getElementById('root'));
   </script>
 </body>
 </html>
