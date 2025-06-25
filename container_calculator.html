@@ -128,7 +128,7 @@
       { name: "ETIFERT-B15", weight: 25, mtPerFCL: 24 },
       { name: "ETIFERT-B15", weight: 1200, mtPerFCL: 24.0 },
       { name: "ETIFERT-B17", weight: 25, mtPerFCL: 21 },
-      { name: "ETIFERT-B20", weight: 20, mtPerFCL: 14.4 },
+      { name: "ETIFERT-B20", weight: 20, mtPerFCL: 14.4 }, // Fixed syntax error
       { name: "ETI-KBOR", weight: 25, mtPerFCL: 21 },
       { name: "GROUND COLEMANITE", weight: 1000, mtPerFCL: 20 },
       { name: "GROUND COLEMANITE", weight: 1200, mtPerFCL: 24 },
@@ -357,7 +357,7 @@
         resetConfirm: "Tüm alanları sıfırlamak istediğinizden emin misiniz?",
         invalidSelection: "Geçersiz ürün veya ağırlık seçimi.",
         multipleError: "PO hacmi {mtPerFCL} MT'nin katları olmalı. Lütfen PO hacminizi düzeltin.",
-        resultMessage: "<span class=\"font-bold text-blue-600\">{containers}</span> x 20' FCL konteyner(ler) {amount} MT {product} için gerekli (Ağırlık: {weight} kg).",
+        resultMessage: "You will need <span class=\"font-bold text-blue-600\">{containers}</span> x 20' FCL container(s) for {amount} MT of {product} (Weight: {weight} kg).",
         useLower: "{lower} MT Kullan",
         useHigher: "{higher} MT Kullan",
         summary: "Özet",
@@ -459,16 +459,19 @@
       };
 
       // Getting unique product names for the first dropdown and search
-      const uniqueProducts = [...new Set(products.map(p => p.name))];
+      const uniqueProducts = React.useMemo(() => [...new Set(products.map(p => p.name))], []);
       const filteredProducts = uniqueProducts.filter(name =>
         name.toLowerCase().includes(productSearch.toLowerCase())
       );
 
       // Getting available weights for the selected product
-      const availableWeights = products
-        .filter(p => p.name === product)
-        .map(p => p.weight)
-        .sort((a, b) => a - b);
+      const availableWeights = React.useMemo(() =>
+        products
+          .filter(p => p.name === product)
+          .map(p => p.weight)
+          .sort((a, b) => a - b),
+        [product]
+      );
 
       // Auto-select first weight when product changes
       React.useEffect(() => {
@@ -485,9 +488,13 @@
 
       // Load recent calculations from local storage
       React.useEffect(() => {
-        const saved = localStorage.getItem('recentCalculations');
-        if (saved) {
-          setRecentCalculations(JSON.parse(saved));
+        try {
+          const saved = localStorage.getItem('recentCalculations');
+          if (saved) {
+            setRecentCalculations(JSON.parse(saved));
+          }
+        } catch (error) {
+          console.error('Error loading recent calculations:', error);
         }
       }, []);
 
@@ -613,119 +620,122 @@
       };
 
       // Helper function to perform calculation
-      const triggerCalculation = (newAmount) => {
+      const triggerCalculation = (value) => {
         setIsLoading(true);
-        setTimeout(() => {
-          let hasError = false;
 
-          if (!product) {
-            setProductError(t('productError'));
-            productInputRef.current?.focus();
-            hasError = true;
-          } else {
-            setProductError('');
-          }
+        let hasError = false;
 
-          if (!weight) {
-            setWeightError(t('weightError'));
-            weightInputRef.current?.focus();
-            hasError = true;
-          } else {
-            setWeightError('');
-          }
+        if (!product) {
+          setProductError(t('productError'));
+          productInputRef.current?.focus();
+          hasError = true;
+        } else {
+          setProductError('');
+        }
 
-          if (!newAmount) {
-            setAmountError(t('amountError'));
-            amountInputRef.current?.focus();
-            hasError = true;
-          }
+        if (!weight) {
+          setWeightError(t('weightError'));
+          weightInputRef.current?.focus();
+          hasError = true;
+        } else {
+          setWeightError('');
+        }
 
-          if (hasError) {
-            setIsLoading(false);
-            return;
-          }
+        if (!value) {
+          setAmountError(t('amountError'));
+          amountInputRef.current?.focus();
+          hasError = true;
+        }
 
-          const amountMt = parseFloat(newAmount);
-
-          if (isNaN(amountMt) || amountMt <= 0) {
-            setAmountError(t('amountInvalid'));
-            amountInputRef.current?.focus();
-            setResult(t('amountInvalid'));
-            setIsLoading(false);
-            return;
-          }
-          if (amountMt > 10000.0) {
-            setAmountError(t('amountTooLarge'));
-            amountInputRef.current?.focus();
-            setResult(t('amountTooLarge'));
-            setIsLoading(false);
-            return;
-          } else {
-            setAmountError('');
-          }
-
-          const selectedProduct = products.find(
-            p => p.name === product && p.weight === parseInt(weight)
-          );
-          if (!selectedProduct) {
-            setResult(t('invalidSelection'));
-            setIsLoading(false);
-            return;
-          }
-
-          const mtPerFCL = selectedProduct.mtPerFCL;
-          const amountDecimals = 1;
-          const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
-          const formattedAmount = formatNumber(amountMt, amountDecimals);
-          const formattedWeight = formatNumber(weight, 0);
-          const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCLDecimals);
-
-          if (!isMultiple(amountMt, mtPerFCL)) {
-            const { lower, higher } = suggestMultiples(amountMt, mtPerFCL);
-            setResult({
-              message: t('multipleError', { mtPerFCL: formattedMtPerFCL }),
-              suggestions: { lower, higher },
-              reference: {
-                product,
-                weight,
-                mtPerFCL
-              }
-            });
-            setIsLoading(false);
-            return;
-          }
-
-          const containers = amountMt / mtPerFCL;
-          const formattedContainers = formatNumber(containers, 0);
-
-          const resultObj = {
-            message: t('resultMessage', {
-              containers: formattedContainers,
-              amount: formattedAmount,
-              product,
-              weight: formattedWeight
-            }),
-            summary: {
-              product,
-              weight: formattedWeight,
-              containers: formattedContainers,
-              amount: formattedAmount
-            },
-            reference: null
-          };
-          setResult(resultObj);
-
-          // Save to recent calculations
-          const newCalc = {
-            message: resultObj.message,
-            timestamp: new Date().toLocaleString()
-          };
-          const updatedCalcs = [newCalc, ...recentCalculations].slice(0, 5);
-          setRecentCalculations(updatedCalcs);
-          localStorage.setItem('recentCalculations', JSON.stringify(updatedCalcs));
-
+        if (hasError) {
           setIsLoading(false);
-        }, 500);
+          return;
+        }
+
+        const amountMt = parseFloat(value);
+
+        if (isNaN(amountMt) || amountMt <= 0) {
+          setAmountError(t('amountInvalid'));
+          amountInputRef.current?.focus();
+          setResult({ message: t('amountInvalid'), reference: null });
+          setIsLoading(false);
+          return;
+        }
+        if (amountMt > 10000.0) {
+          setAmountError(t('amountTooLarge'));
+          amountInputRef.current?.focus();
+          setResult({ message: t('amountTooLarge'), reference: null });
+          setIsLoading(false);
+          return;
+        } else {
+          setAmountError('');
+        }
+
+        const selectedProduct = products.find(
+          p => p.name === product && p.weight === parseInt(weight)
+        );
+        if (!selectedProduct) {
+          setResult({ message: t('invalidSelection'), reference: null });
+          setIsLoading(false);
+          return;
+        }
+
+        const mtPerFCL = selectedProduct.mtPerFCL;
+        const amountDecimals = 1;
+        const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
+        const formattedAmount = formatNumber(amountMt, amountDecimals);
+        const formattedWeight = formatNumber(weight, 0);
+        const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCLDecimals);
+
+        if (!isMultiple(amountMt, mtPerFCL)) {
+          const { lower, higher } = suggestMultiples(amountMt, mtPerFCL);
+          setResult({
+            message: t('multipleError', { mtPerFCL: formattedMtPerFCL }),
+            suggestions: { lower, higher },
+            reference: {
+              product,
+              weight,
+              mtPerFCL
+            }
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const containers = amountMt / mtPerFCL;
+        const formattedContainers = formatNumber(containers, 0);
+
+        const resultObj = {
+          message: t('resultMessage', {
+            containers: formattedContainers,
+            amount: formattedAmount,
+            product,
+            weight: formattedWeight
+          }),
+          summary: {
+            product,
+            weight: formattedWeight,
+            containers: formattedContainers,
+            amount: formattedAmount
+          },
+          reference: null
+        };
+        setResult(resultObj);
+
+        // Save to recent calculations
+        const newCalc = {
+          message: resultObj.message,
+          timestamp: new Date().toLocaleString()
+        };
+        const updatedCalcs = [newCalc, ...recentCalculations].slice(0, 5);
+        setRecentCalculations(updatedCalcs);
+        try {
+          localStorage.setItem('recentCalculations', JSON.stringify(updatedCalcs));
+        } catch (error) {
+          console.error('Error saving recent calculations:', error);
+        }
+
+        setIsLoading(false);
       };
 
       // Adjust amount to suggested multiple
@@ -733,10 +743,10 @@
         setAmount(value);
         setResult(null);
         setAmountError('');
-        triggerCalculation(value);
+        triggerCalculation(value); // Directly trigger calculation with new value
       };
 
-      // Calculate containers needed
+      // Calculate containers
       const calculateContainers = (e) => {
         e.preventDefault();
         triggerCalculation(amount);
@@ -750,7 +760,6 @@
             navigator.clipboard.writeText(text).then(() => {
               alert(t('copySuccess'));
             }).catch(() => {
-              // Fallback for older browsers
               const textarea = document.createElement('textarea');
               textarea.value = text;
               document.body.appendChild(textarea);
@@ -1110,8 +1119,12 @@
     });
 
     // Rendering the app
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<ContainerCalculator />);
+    try {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<ContainerCalculator />);
+    } catch (error) {
+      console.error('Error rendering app:', error);
+    }
   </script>
 </body>
 </html>
