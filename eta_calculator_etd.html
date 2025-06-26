@@ -638,7 +638,7 @@
     );
 
     const ETACalculator = () => {
-      const today = new Date("2025-06-25T16:35:00+08:00"); // Updated to 04:35 PM HKT on June 25, 2025
+      const today = new Date(); // Dynamic current date (03:12 PM HKT, June 26, 2025)
       const defaultEtaDate = new Date(today);
       defaultEtaDate.setDate(today.getDate() + 80); // Set default ETA to 80 days from today
       const [eta, setEta] = React.useState(defaultEtaDate.toISOString().split('T')[0]);
@@ -857,22 +857,24 @@
             return;
           }
 
-          const transitTime = selectedPort.transitTime;
+          const transitTime = selectedPort.transitTime; // 60 days for Dalian
           const preparationTime = 20;
           const etaDate = new Date(eta);
-          etaDate.setHours(0, 0, 0, 0);
-          const calculatedEtd = subtractDays(etaDate, transitTime);
-          const earliestEtd = addDays(today, preparationTime);
-          earliestEtd.setHours(0, 0, 0, 0);
+          etaDate.setHours(0, 0, 0, 0); // Normalize to start of day
+          const todayDate = new Date(); // June 26, 2025, 03:12 PM HKT
+          todayDate.setHours(0, 0, 0, 0); // Normalize to start of day
+          const calculatedEtd = subtractDays(etaDate, transitTime); // Should be July 15, 2025 for ETA Sep 13
+          const earliestEtd = addDays(todayDate, preparationTime); // July 16, 2025
 
           let resultObj;
           let reviseETAMessage = '';
 
           if (calculatedEtd < earliestEtd) {
-            const earliestEta = addDays(earliestEtd, transitTime);
+            const earliestEta = addDays(earliestEtd, transitTime); // July 16 + 60 = September 14, 2025
             reviseETAMessage = translations[language].reviseETAMessage
-              .replace(/<date>/g, formatDate(earliestEtd))
-              .replace('<newdate>', formatDate(earliestEta));
+              .replace('<date>', formatDate(earliestEtd)) // First <date> = earliestEtd (July 16, 2025)
+              .replace('calculated ETD is <date>', `calculated ETD is ${formatDate(calculatedEtd)}`) // Second <date> = calculatedEtd (July 15, 2025)
+              .replace('<newdate>', formatDate(earliestEta)); // <newdate> = earliestEta (September 14, 2025)
             setResult({ message: reviseETAMessage, summary: {}, notes: [] });
             setIsLoading(false);
             return;
@@ -997,6 +999,27 @@
                 />
                 <h1 className="text-3xl font-bold text-center text-blue-900 mb-[-10px] mt-[-50px]">ETA Calculator</h1>
               </div>
+              {showWelcome && (
+                <div className="modal">
+                  <div className="modal-content">
+                    <span className="close-button" onClick={() => setShowWelcome(false)}>×</span>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">{translations[language].welcomeTitle}</h2>
+                    <p className="text-gray-600 mb-4" dangerouslySetInnerHTML={{ __html: translations[language].welcomeMessage }}></p>
+                    <p className="text-gray-600 mb-4" dangerouslySetInnerHTML={{ __html: translations[language].welcomeInstruction2 }}></p>
+                    <select
+                      className="px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                    >
+                      <option value="en">English</option>
+                      <option value="zh">繁體中文（中國香港）</option>
+                      <option value="zh-cn">简体中文（中国大陆）</option>
+                      <option value="tr">Türkçe</option>
+                      <option value="ms">Bahasa Melayu</option>
+                    </select>
+                  </div>
+                </div>
+              )}
               <form onSubmit={calculateETA} className="space-y-6 mt-6">
                 <div>
                   <Tooltip text={translations[language].etaTooltip}>
@@ -1012,6 +1035,7 @@
                       onChange={handleEtaChange}
                       ref={etaInputRef}
                       className="mt-1 flex-1 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      min={today.toISOString().split('T')[0]} // Restrict past dates
                     />
                     <button
                       type="button"
@@ -1171,7 +1195,7 @@
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="flex-1 bg-red-600 text-white font-semibold py-3 px-4 rounded-md hover:bg-red-700 hover:scale-105 transform transition focus:outline-none focus:ring-2 focus:ring-red-600"
+                    className="flex-1 bg-red-600 text-white font-semibold py-1 px-2 rounded-md hover:bg-red-700 hover:scale-105 transform transition focus:outline-none focus:ring-2 focus:ring-red-600 text-sm"
                   >
                     {translations[language].resetButton}
                   </button>
@@ -1234,47 +1258,46 @@
                             <span className="summary-label">{translations[language].portAdditionalPrice}:</span>
                             <span className="summary-value">{result.summary.portAdditionalPrice}</span>
                           </div>
-                          {result.summary.bagAdditionalPrice && (
-                            <div className="summary-item">
-                              <span className="summary-label">{translations[language].bagAdditionalPrice}:</span>
-                              <span className="summary-value">{result.summary.bagAdditionalPrice}</span>
-                            </div>
-                          )}
                           <div className="summary-item">
-                            <span className="summary-label font-bold text-lg align-bottom">{translations[language].finalPrice}:</span>
-                            <span className="summary-value final-price font-bold" style={{ color: '#9333EA' }}>{result.summary.finalPrice}</span>
+                            <span className="summary-label">{translations[language].bagAdditionalPrice}:</span>
+                            <span className="summary-value">{result.summary.bagAdditionalPrice || 'USD 0 USD/MT'}</span>
                           </div>
-                          <div className="mt-4">
-                            <button
-                              onClick={copyResult}
-                              className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
-                            >
-                              {translations[language].copyResult}
-                            </button>
+                          <div className="summary-item">
+                            <span className="summary-label">{translations[language].finalPrice}:</span>
+                            <span className="summary-value final-price">{result.summary.finalPrice}</span>
                           </div>
                         </div>
                       )}
                     </div>
-                  </div>
-                </div>
-              )}
-              {recentCalculations.length > 0 && (
-                <div className="mt-8">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold text-gray-700">{language === 'ms' ? translations[language].carianTerkini : translations[language].recentResults}</h2>
                     <button
-                      onClick={clearHistory}
-                      className="text-sm text-white font-semibold py-2 px-3 rounded-md bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600"
+                      onClick={copyResult}
+                      className="mt-4 w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
                     >
-                      {translations[language].clearAll}
+                      {translations[language].copyResult}
                     </button>
                   </div>
-                  <div className="space-y-2">
-                    {recentCalculations.map((calc, index) => (
-                      <div key={index} className="p-2 bg-gray-100 rounded-md text-sm">
-                        <span dangerouslySetInnerHTML={{ __html: calc.message }} /> <br /> <span className="text-xs text-gray-500">{calc.timestamp}</span>
+                  <div className="mt-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-bold text-blue-800">{translations[language].recentResults}</h3>
+                      <button
+                        onClick={clearHistory}
+                        className="bg-red-600 text-white font-semibold py-1 px-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 text-sm"
+                      >
+                        {translations[language].clearAll}
+                      </button>
+                    </div>
+                    {recentCalculations.length > 0 ? (
+                      <div className="mt-2">
+                        {recentCalculations.map((calc, index) => (
+                          <div key={index} className="mt-2 p-3 bg-white border border-gray-200 rounded-md shadow-md">
+                            <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: calc.message }}></p>
+                            <span className="text-xs text-gray-400 block mt-1">{calc.timestamp}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      <p className="text-sm text-gray-600 mt-2">No recent calculations.</p>
+                    )}
                   </div>
                 </div>
               )}
