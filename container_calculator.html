@@ -111,10 +111,12 @@
       { name: "ETIBOR-48 BORAX PENTAHYDRATE - GRANULAR", weight: 25, mtPerFCL: 24 },
       { name: "ETIBOR-48 BORAX PENTAHYDRATE - GRANULAR", weight: 1000, mtPerFCL: 20 },
       { name: "ETIBOR-48 BORAX PENTAHYDRATE - GRANULAR", weight: 1200, mtPerFCL: 24 },
+      { name: "ETIBOR-48 BORAX PENTAHYDRATE - POWDER", weight: 25, mtPerFCL: 20 },
       { name: "ETIBOR-48 BORAX PENTAHYDRATE - POWDER", weight: 1000, mtPerFCL: 20 },
       { name: "ETIBOR-68 ANHYDROUS BORAX - GRANULAR", weight: 25, mtPerFCL: 24 },
       { name: "ETIBOR-68 ANHYDROUS BORAX - GRANULAR", weight: 1000, mtPerFCL: 20 },
       { name: "ETIBOR-68 ANHYDROUS BORAX - GRANULAR", weight: 1200, mtPerFCL: 24 },
+      { name: "ETIBOR-68 ANHYDROUS BORAX - POWDER", weight: 25, mtPerFCL: 24 },
       { name: "ETIBOR-68 ANHYDROUS BORAX - POWDER", weight: 1000, mtPerFCL: 20 },
       { name: "ETIBOR-68 ANHYDROUS BORAX - POWDER", weight: 1200, mtPerFCL: 24 },
       { name: "ETICOL-43", weight: 1000, mtPerFCL: 20 },
@@ -128,7 +130,7 @@
       { name: "ETIFERT-B15", weight: 25, mtPerFCL: 24 },
       { name: "ETIFERT-B15", weight: 1200, mtPerFCL: 24.0 },
       { name: "ETIFERT-B17", weight: 25, mtPerFCL: 21 },
-      { name: "ETIFERT-B20", weight: 20, mtPerFCL: 14.4 }, // Fixed syntax error
+      { name: "ETIFERT-B20", weight: 20, mtPerFCL: 14.4 },
       { name: "ETI-KBOR", weight: 25, mtPerFCL: 21 },
       { name: "GROUND COLEMANITE", weight: 1000, mtPerFCL: 20 },
       { name: "GROUND COLEMANITE", weight: 1200, mtPerFCL: 24 },
@@ -137,6 +139,23 @@
       { name: "ZINC BORATE", weight: 800, mtPerFCL: 16 },
       { name: "ZINC BORATE", weight: 1000, mtPerFCL: 20 }
     ];
+
+    // Pallet information for specific products and weights
+    const palletInfo = {
+      "BORIC ACID - GRANULAR_25": { bagsPerPallet: 42 },
+      "BORIC ACID - POWDER_25": { bagsPerPallet: 42 },
+      "ETIFERT-B17_25": { bagsPerPallet: 42 },
+      "BORAX DECAHYDRATE - GRANULAR_25": { bagsPerPallet: 42 },
+      "BORAX DECAHYDRATE - POWDER_25": { bagsPerPallet: 42 },
+      "ETIFERT-B11_25": { bagsPerPallet: 42 },
+      "ETIBOR-48 BORAX PENTAHYDRATE - GRANULAR_25": { bagsPerPallet: 48 },
+      "ETIBOR-48 BORAX PENTAHYDRATE - POWDER_25": { bagsPerPallet: 48 },
+      "ETIFERT-B15_25": { bagsPerPallet: 48 },
+      "ETIBOR-68 ANHYDROUS BORAX - GRANULAR_25": { bagsPerPallet: 48 },
+      "ETIBOR-68 ANHYDROUS BORAX - POWDER_25": { bagsPerPallet: 48 },
+      "ETIDOT-67_20": { bagsPerPallet: 36 },
+      "ETIFERT-B20_20": { bagsPerPallet: 36 }
+    };
 
     // Translation object
     const translations = {
@@ -166,14 +185,15 @@
         invalidSelection: "Invalid product or weight selection.",
         multipleError: "The PO volume must be in multiples of {mtPerFCL} MT. Please revise your PO volume.",
         resultMessage: "You will need <span class=\"font-bold text-blue-600\">{containers}</span> x 20' FCL container(s) for {amount} MT of {product} (Weight: {weight} kg).",
-        useLower: "Use {lower} MT",
-        useHigher: "Use {higher} MT",
+        useLower1: "Use {lower1} MT",
+        useHigher1: "Use {higher1} MT",
         summary: "Summary",
         product: "Product",
         weight: "Weight",
         containers: "Containers",
         container: "Container",
         volume: "Volume",
+        bagsPerPallet: "Bags per Pallet",
         copyResult: "Copy Result",
         copySuccess: "Result copied to clipboard!",
         copyFailure: "Failed to copy result. Please copy manually.",
@@ -214,14 +234,15 @@
         invalidSelection: "無效嘅產品或重量選擇。",
         multipleError: "訂單量要係{mtPerFCL}公噸嘅倍數，請修正訂單量。",
         resultMessage: "你需要<span class=\"font-bold text-blue-600\">{containers}</span>個20呎貨櫃去運{amount}公噸嘅{product}（重量：{weight}公斤）。",
-        useLower: "用{lower}公噸",
-        useHigher: "用{higher}公噸",
+        useLower1: "用{lower1}公噸",
+        useHigher1: "用{higher1}公噸",
         summary: "總結",
         product: "產品",
         weight: "重量",
         containers: "貨櫃",
         container: "貨櫃",
         volume: "訂單量",
+        bagsPerPallet: "每棧板袋數",
         copyResult: "複製結果",
         copySuccess: "結果已複製到剪貼板！",
         copyFailure: "複製結果失敗，請手動複製。",
@@ -262,14 +283,15 @@
         invalidSelection: "无效的产品或重量选择。",
         multipleError: "订单量必须是{mtPerFCL}公吨的倍数，请修正您的订单量。",
         resultMessage: "您需要<span class=\"font-bold text-blue-600\">{containers}</span>个20英尺集装箱来运输{amount}公吨的{product}（重量：{weight}公斤）。",
-        useLower: "使用{lower}公吨",
-        useHigher: "使用{higher}公吨",
+        useLower1: "使用{lower1}公吨",
+        useHigher1: "使用{higher1}公吨",
         summary: "总结",
         product: "产品",
         weight: "重量",
         containers: "集装箱",
         container: "集装箱",
         volume: "订单量",
+        bagsPerPallet: "每托盘袋数",
         copyResult: "复制结果",
         copySuccess: "结果已复制到剪贴板！",
         copyFailure: "无法复制结果，请手动复制。",
@@ -310,14 +332,15 @@
         invalidSelection: "Pemilihan produk atau berat tidak sah.",
         multipleError: "Jumlah PO mesti dalam gandaan {mtPerFCL} MT. Sila semak jumlah PO anda.",
         resultMessage: "Anda memerlukan <span class=\"font-bold text-blue-600\">{containers}</span> x kontena 20' FCL untuk {amount} MT bagi {product} (Berat: {weight} kg).",
-        useLower: "Guna {lower} MT",
-        useHigher: "Guna {higher} MT",
+        useLower1: "Guna {lower1} MT",
+        useHigher1: "Guna {higher1} MT",
         summary: "Ringkasan",
         product: "Produk",
         weight: "Berat",
         containers: "Kontena",
         container: "Kontena",
         volume: "Jumlah",
+        bagsPerPallet: "Beg setiap Palet",
         copyResult: "Salin Hasil",
         copySuccess: "Hasil disalin ke papan klip!",
         copyFailure: "Gagal menyalin hasil. Sila salin secara manual.",
@@ -357,15 +380,16 @@
         resetConfirm: "Tüm alanları sıfırlamak istediğinizden emin misiniz?",
         invalidSelection: "Geçersiz ürün veya ağırlık seçimi.",
         multipleError: "PO hacmi {mtPerFCL} MT'nin katları olmalı. Lütfen PO hacminizi düzeltin.",
-        resultMessage: "You will need <span class=\"font-bold text-blue-600\">{containers}</span> x 20' FCL container(s) for {amount} MT of {product} (Weight: {weight} kg).",
-        useLower: "{lower} MT Kullan",
-        useHigher: "{higher} MT Kullan",
+        resultMessage: "<span class=\"font-bold text-blue-600\">{containers}</span> x 20' FCL konteyner(ler) {amount} MT {product} için gerekli (Ağırlık: {weight} kg).",
+        useLower1: "{lower1} MT Kullan",
+        useHigher1: "{higher1} MT Kullan",
         summary: "Özet",
         product: "Ürün",
         weight: "Ağırlık",
         containers: "Konteynerler",
         container: "Konteyner",
         volume: "Hacim",
+        bagsPerPallet: "Palet Başına Çuval",
         copyResult: "Sonucu Kopyala",
         copySuccess: "Sonuç panoya kopyalandı!",
         copyFailure: "Sonuç kopyalanamadı. Lütfen manuel kopyalayın.",
@@ -382,7 +406,7 @@
       }
     };
 
-    // Function to format numbers with commas and fixed decimals
+    // Format numbers with commas and fixed decimals
     const formatNumber = (num, decimals = 0) => {
       if (isNaN(num)) return "0";
       const fixed = Number(num).toFixed(decimals);
@@ -391,23 +415,25 @@
       return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
     };
 
-    // Check if a number is a multiple of another, avoiding floating-point precision issues
+    // Check if a number is a multiple of another, with robust handling for floating-point errors
     const isMultiple = (value, multiple) => {
-      const scale = 1000;
+      const decimals = multiple % 1 === 0 ? 0 : Math.max(4, String(multiple).split('.')[1].length);
+      const scale = Math.pow(10, decimals);
       const scaledValue = Math.round(value * scale);
       const scaledMultiple = Math.round(multiple * scale);
       return scaledValue % scaledMultiple === 0;
     };
 
-    // Function to suggest nearest valid multiples
+    // Suggest one lower and one higher valid multiple
     const suggestMultiples = (amountMt, mtPerFCL) => {
-      let lowerMultiple = Math.floor(amountMt / mtPerFCL) * mtPerFCL;
-      if (lowerMultiple === 0) lowerMultiple = mtPerFCL;
-      const higherMultiple = lowerMultiple + mtPerFCL;
       const decimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
+      const lowerMultiple = Math.floor(amountMt / mtPerFCL);
+      const higherMultiple = Math.ceil(amountMt / mtPerFCL);
+      const lower1 = lowerMultiple * mtPerFCL;
+      const higher1 = higherMultiple * mtPerFCL;
       return {
-        lower: formatNumber(lowerMultiple, decimals),
-        higher: formatNumber(higherMultiple, decimals)
+        lower1: formatNumber(lower1, decimals),
+        higher1: formatNumber(higher1, decimals)
       };
     };
 
@@ -421,7 +447,7 @@
       );
     };
 
-    // Creating the main React component
+    // Main React component
     const ContainerCalculator = () => {
       const [product, setProduct] = React.useState('');
       const [weight, setWeight] = React.useState('');
@@ -458,20 +484,17 @@
         setLanguage(e.target.value);
       };
 
-      // Getting unique product names for the first dropdown and search
-      const uniqueProducts = React.useMemo(() => [...new Set(products.map(p => p.name))], []);
+      // Get unique product names for dropdown and search
+      const uniqueProducts = [...new Set(products.map(p => p.name))];
       const filteredProducts = uniqueProducts.filter(name =>
         name.toLowerCase().includes(productSearch.toLowerCase())
       );
 
-      // Getting available weights for the selected product
-      const availableWeights = React.useMemo(() =>
-        products
-          .filter(p => p.name === product)
-          .map(p => p.weight)
-          .sort((a, b) => a - b),
-        [product]
-      );
+      // Get available weights for the selected product
+      const availableWeights = products
+        .filter(p => p.name === product)
+        .map(p => p.weight)
+        .sort((a, b) => a - b);
 
       // Auto-select first weight when product changes
       React.useEffect(() => {
@@ -488,17 +511,13 @@
 
       // Load recent calculations from local storage
       React.useEffect(() => {
-        try {
-          const saved = localStorage.getItem('recentCalculations');
-          if (saved) {
-            setRecentCalculations(JSON.parse(saved));
-          }
-        } catch (error) {
-          console.error('Error loading recent calculations:', error);
+        const saved = localStorage.getItem('recentCalculations');
+        if (saved) {
+          setRecentCalculations(JSON.parse(saved));
         }
       }, []);
 
-      // Handling product search
+      // Handle product search
       const handleProductSearchChange = (e) => {
         setProductSearch(e.target.value);
         setProduct('');
@@ -543,7 +562,7 @@
         productInputRef.current?.focus();
       };
 
-      // Handling product selection
+      // Handle product selection
       const handleProductChange = (e) => {
         setProduct(e.target.value);
         setWeight('');
@@ -555,7 +574,7 @@
         setProductSearch('');
       };
 
-      // Handling weight selection
+      // Handle weight selection
       const handleWeightChange = (e) => {
         setWeight(e.target.value);
         setAmount('');
@@ -565,7 +584,7 @@
         amountInputRef.current?.focus();
       };
 
-      // Handling amount input
+      // Handle amount input
       const handleAmountChange = (e) => {
         const value = e.target.value;
         if (value === "" || /^\d*\.?\d{0,1}$/.test(value)) {
@@ -619,137 +638,145 @@
         }
       };
 
-      // Helper function to perform calculation
-      const triggerCalculation = (value) => {
+      // Calculate containers
+      const triggerCalculation = (newAmount) => {
         setIsLoading(true);
+        setTimeout(() => {
+          let hasError = false;
 
-        let hasError = false;
+          if (!product) {
+            setProductError(t('productError'));
+            productInputRef.current?.focus();
+            hasError = true;
+          } else {
+            setProductError('');
+          }
 
-        if (!product) {
-          setProductError(t('productError'));
-          productInputRef.current?.focus();
-          hasError = true;
-        } else {
-          setProductError('');
-        }
+          if (!weight) {
+            setWeightError(t('weightError'));
+            weightInputRef.current?.focus();
+            hasError = true;
+          } else {
+            setWeightError('');
+          }
 
-        if (!weight) {
-          setWeightError(t('weightError'));
-          weightInputRef.current?.focus();
-          hasError = true;
-        } else {
-          setWeightError('');
-        }
+          if (!newAmount) {
+            setAmountError(t('amountError'));
+            amountInputRef.current?.focus();
+            hasError = true;
+          }
 
-        if (!value) {
-          setAmountError(t('amountError'));
-          amountInputRef.current?.focus();
-          hasError = true;
-        }
+          if (hasError) {
+            setIsLoading(false);
+            return;
+          }
 
-        if (hasError) {
-          setIsLoading(false);
-          return;
-        }
+          // Remove commas from newAmount
+          const cleanedAmount = newAmount.replace(/,/g, '');
+          const amountMt = parseFloat(cleanedAmount);
 
-        const amountMt = parseFloat(value);
+          if (isNaN(amountMt) || amountMt <= 0) {
+            setAmountError(t('amountInvalid'));
+            amountInputRef.current?.focus();
+            setResult(t('amountInvalid'));
+            setIsLoading(false);
+            return;
+          }
+          if (amountMt > 10000.0) {
+            setAmountError(t('amountTooLarge'));
+            amountInputRef.current?.focus();
+            setResult(t('amountTooLarge'));
+            setIsLoading(false);
+            return;
+          } else {
+            setAmountError('');
+          }
 
-        if (isNaN(amountMt) || amountMt <= 0) {
-          setAmountError(t('amountInvalid'));
-          amountInputRef.current?.focus();
-          setResult({ message: t('amountInvalid'), reference: null });
-          setIsLoading(false);
-          return;
-        }
-        if (amountMt > 10000.0) {
-          setAmountError(t('amountTooLarge'));
-          amountInputRef.current?.focus();
-          setResult({ message: t('amountTooLarge'), reference: null });
-          setIsLoading(false);
-          return;
-        } else {
-          setAmountError('');
-        }
+          const selectedProduct = products.find(
+            p => p.name === product && p.weight === parseInt(weight)
+          );
+          if (!selectedProduct) {
+            setResult(t('invalidSelection'));
+            setIsLoading(false);
+            return;
+          }
 
-        const selectedProduct = products.find(
-          p => p.name === product && p.weight === parseInt(weight)
-        );
-        if (!selectedProduct) {
-          setResult({ message: t('invalidSelection'), reference: null });
-          setIsLoading(false);
-          return;
-        }
+          const mtPerFCL = selectedProduct.mtPerFCL;
+          const amountDecimals = 1;
+          const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
+          const formattedAmount = formatNumber(amountMt, amountDecimals);
+          const formattedWeight = formatNumber(weight, 0);
+          const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCLDecimals);
 
-        const mtPerFCL = selectedProduct.mtPerFCL;
-        const amountDecimals = 1;
-        const mtPerFCLDecimals = mtPerFCL % 1 === 0 ? 0 : String(mtPerFCL).split('.')[1].length;
-        const formattedAmount = formatNumber(amountMt, amountDecimals);
-        const formattedWeight = formatNumber(weight, 0);
-        const formattedMtPerFCL = formatNumber(mtPerFCL, mtPerFCLDecimals);
+          if (!isMultiple(amountMt, mtPerFCL)) {
+            const { lower1, higher1 } = suggestMultiples(amountMt, mtPerFCL);
+            setResult({
+              message: t('multipleError', { mtPerFCL: formattedMtPerFCL }),
+              suggestions: { lower1, higher1 },
+              reference: {
+                product,
+                weight,
+                mtPerFCL
+              }
+            });
+            setIsLoading(false);
+            return;
+          }
 
-        if (!isMultiple(amountMt, mtPerFCL)) {
-          const { lower, higher } = suggestMultiples(amountMt, mtPerFCL);
-          setResult({
-            message: t('multipleError', { mtPerFCL: formattedMtPerFCL }),
-            suggestions: { lower, higher },
-            reference: {
+          const containers = amountMt / mtPerFCL;
+          const formattedContainers = formatNumber(containers, 0);
+
+          // Get bags per pallet for the selected product and weight
+          const palletKey = `${product}_${weight}`;
+          const bagsPerPallet = palletInfo[palletKey] ? palletInfo[palletKey].bagsPerPallet : null;
+
+          const resultObj = {
+            message: t('resultMessage', {
+              containers: formattedContainers,
+              amount: formattedAmount,
               product,
-              weight,
-              mtPerFCL
-            }
-          });
-          setIsLoading(false);
-          return;
-        }
+              weight: formattedWeight
+            }),
+            summary: {
+              product,
+              weight: formattedWeight,
+              containers: formattedContainers,
+              amount: formattedAmount,
+              bagsPerPallet: bagsPerPallet ? formatNumber(bagsPerPallet, 0) : null
+            },
+            reference: null
+          };
+          setResult(resultObj);
 
-        const containers = amountMt / mtPerFCL;
-        const formattedContainers = formatNumber(containers, 0);
-
-        const resultObj = {
-          message: t('resultMessage', {
-            containers: formattedContainers,
-            amount: formattedAmount,
-            product,
-            weight: formattedWeight
-          }),
-          summary: {
-            product,
-            weight: formattedWeight,
-            containers: formattedContainers,
-            amount: formattedAmount
-          },
-          reference: null
-        };
-        setResult(resultObj);
-
-        // Save to recent calculations
-        const newCalc = {
-          message: resultObj.message,
-          timestamp: new Date().toLocaleString()
-        };
-        const updatedCalcs = [newCalc, ...recentCalculations].slice(0, 5);
-        setRecentCalculations(updatedCalcs);
-        try {
+          // Save to recent calculations
+          const newCalc = {
+            message: resultObj.message,
+            timestamp: new Date().toLocaleString()
+          };
+          const updatedCalcs = [newCalc, ...recentCalculations].slice(0, 5);
+          setRecentCalculations(updatedCalcs);
           localStorage.setItem('recentCalculations', JSON.stringify(updatedCalcs));
-        } catch (error) {
-          console.error('Error saving recent calculations:', error);
-        }
 
-        setIsLoading(false);
+          setIsLoading(false);
+        }, 500);
       };
 
       // Adjust amount to suggested multiple
       const adjustAmount = (value) => {
-        setAmount(value);
+        const cleanedValue = value.replace(/,/g, '');
+        const formattedValue = parseFloat(cleanedValue).toFixed(1);
+        setAmount(formattedValue);
         setResult(null);
         setAmountError('');
-        triggerCalculation(value); // Directly trigger calculation with new value
+        amountInputRef.current?.focus();
       };
 
       // Calculate containers
       const calculateContainers = (e) => {
         e.preventDefault();
-        triggerCalculation(amount);
+        if (amount && product && weight) {
+          triggerCalculation(amount);
+        }
       };
 
       // Copy result to clipboard
@@ -785,7 +812,7 @@
         productInputRef.current?.focus();
       };
 
-      // Rendering the container
+      // Render the container
       return (
         <div className="container max-w-lg mx-auto bg-white p-8 rounded-lg shadow-lg">
           {/* Language Dropdown */}
@@ -823,7 +850,7 @@
                   >
                     <option value="en">English</option>
                     <option value="zh_HK">繁體中文 (香港)</option>
-                    <option value="zh_CN">简体中文（中国大陆）</option>
+                    <option value="zh_CN">简体中文</option>
                     <option value="ms">Bahasa Melayu</option>
                     <option value="tr">Türkçe</option>
                   </select>
@@ -1026,20 +1053,20 @@
                 dangerouslySetInnerHTML={{ __html: result.message }}
               ></p>
               {result.suggestions && (
-                <div className="mt-4 flex justify-center space-x-2">
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
                   <button
-                    onClick={() => adjustAmount(result.suggestions.lower)}
+                    onClick={() => adjustAmount(result.suggestions.lower1)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-                    aria-label={t('useLower', { lower: result.suggestions.lower })}
+                    aria-label={t('useLower1', { lower1: result.suggestions.lower1 })}
                   >
-                    {t('useLower', { lower: result.suggestions.lower })}
+                    {t('useLower1', { lower1: result.suggestions.lower1 })}
                   </button>
                   <button
-                    onClick={() => adjustAmount(result.suggestions.higher)}
+                    onClick={() => adjustAmount(result.suggestions.higher1)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-                    aria-label={t('useHigher', { higher: result.suggestions.higher })}
+                    aria-label={t('useHigher1', { higher1: result.suggestions.higher1 })}
                   >
-                    {t('useHigher', { higher: result.suggestions.higher })}
+                    {t('useHigher1', { higher1: result.suggestions.higher1 })}
                   </button>
                 </div>
               )}
@@ -1064,6 +1091,12 @@
                         <td className="py-1 font-medium">{t('volume')}:</td>
                         <td>{result.summary.amount} MT</td>
                       </tr>
+                      {result.summary.bagsPerPallet && (
+                        <tr>
+                          <td className="py-1 font-medium">{t('bagsPerPallet')}:</td>
+                          <td>{result.summary.bagsPerPallet}</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                   <button
@@ -1118,13 +1151,9 @@
       e.preventDefault();
     });
 
-    // Rendering the app
-    try {
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(<ContainerCalculator />);
-    } catch (error) {
-      console.error('Error rendering app:', error);
-    }
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<ContainerCalculator />);
   </script>
 </body>
 </html>
