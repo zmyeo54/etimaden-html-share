@@ -779,10 +779,25 @@
         }
       };
 
-      // Copy result to clipboard
+      // Copy result to clipboard, including summary with extra line break
       const copyResult = () => {
         if (result && result.message) {
-          const text = result.message.replace(/<[^>]+>/g, '');
+          // Strip HTML tags from the result message
+          const messageText = result.message.replace(/<[^>]+>/g, '');
+          let text = messageText;
+
+          // Append summary with an extra line break
+          if (result.summary) {
+            text += `\n\n${t('summary')}:\n`; // Modified: Added extra \n
+            text += `${t('product')}: ${result.summary.product}\n`;
+            text += `${t('weight')}: ${result.summary.weight} kg\n`;
+            text += `${result.summary.containers === "1" ? t('container') : t('containers')}: ${result.summary.containers}\n`;
+            text += `${t('volume')}: ${result.summary.amount} MT\n`;
+            if (result.summary.bagsPerPallet) {
+              text += `${t('bagsPerPallet')}: ${result.summary.bagsPerPallet}\n`;
+            }
+          }
+
           try {
             navigator.clipboard.writeText(text).then(() => {
               alert(t('copySuccess'));
@@ -1072,7 +1087,7 @@
               )}
               {result.summary && (
                 <div className="mt-4">
-                  <h3 className="text-sm font-semibold text-gray-700">{t('summary')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-700 underline">{t('summary')}</h3>
                   <table className="w-full text-sm text-gray-600">
                     <tbody>
                       <tr>
