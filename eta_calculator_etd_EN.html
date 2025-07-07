@@ -714,10 +714,10 @@
               resultObj.notes.push({ text: boricAcidNote, id: resultObj.notes.length + 1 });
             }
             if (selectedPort.additionalPrice === "Spot" && !resultObj.notes.some(note => note.text.includes("Spot"))) {
-              resultObj.notes.push({ text: `Port additional price is 'Spot' for ${pod}, treated as USD 0 USD/MT.`, id: resultObj.notes.length + 1 });
+              resultObj.notes.push({ text: `Port additional price is 'Spot' for ${pod}, treated as 0 USD/MT.`, id: resultObj.notes.length + 1 });
             }
           } else if (selectedPort.additionalPrice === "Spot" && !resultObj.notes.some(note => note.text.includes("Spot"))) {
-            resultObj.notes.push({ text: `Port additional price is 'Spot' for ${pod}, treated as USD 0 USD/MT.`, id: 1 });
+            resultObj.notes.push({ text: `Port additional price is 'Spot' for ${pod}, treated as 0 USD/MT.`, id: 1 });
           }
 
           setResult(resultObj);
