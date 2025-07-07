@@ -691,7 +691,7 @@
             const finalPrice = unitPriceValue + portAdditionalPrice + bagAdditionalPrice + boricAcidAdditionalPrice;
 
             resultObj = {
-              message: `The shipment is scheduled to arrive at <strong style="color: #10B981">${pod}, ${country.toUpperCase()}</strong> on the Required Date of Arrival (ETA) <strong style="color: #808080">${formattedEta}</strong>, with an Estimated Date of Departure (ETD) of <strong style="color: #3B82F6">${formattedEtd}</strong> and a total price of USD <strong style="color: #9333EA">${formatNumber(finalPrice)}</strong>/MT.`,
+              message: `The shipment is scheduled to arrive at <strong style="color: #10B981">${pod}, ${country.toUpperCase()}</strong> on the Required Date of Arrival (ETA) <strong style="color: #808080">${formattedEta}</strong>, with an Estimated Date of Departure (ETD) of <strong style="color: #3B82F6">${formattedEtd}</strong> and a total price of <strong style="color: #9333EA">${formatNumber(finalPrice)}</strong> USD/MT.`,
               summary: {
                 eta: formattedEta,
                 pod: `${pod}, ${country.toUpperCase()}`,
