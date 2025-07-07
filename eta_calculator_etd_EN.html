@@ -674,18 +674,18 @@
 
             if (smallBags20kg) {
               bagAdditionalPrice = 15;
-              bagNote = "<br>❖ Small bags - 20kg/25kg FFS/Laminated PP adds USD 15/MT.";
+              bagNote = "<br>❖ Small bags - 20kg/25kg FFS/Laminated PP adds 15 USD/MT.";
             } else if (smallBagsKraft) {
               bagAdditionalPrice = 25;
-              bagNote = "<br>❖ Small bags - 20kg/25kg Kraft adds USD 25/MT.";
+              bagNote = "<br>❖ Small bags - 20kg/25kg Kraft adds 25 USD/MT.";
             }
 
             if (boricAcidLowSulphate) {
               boricAcidAdditionalPrice = 20;
-              boricAcidNote = "<br>❖ Boric Acid with Low Sulphate adds USD 20/MT.";
+              boricAcidNote = "<br>❖ Boric Acid with Low Sulphate adds 20 USD/MT.";
             } else if (boricAcidUltraLowSulphate) {
               boricAcidAdditionalPrice = 300;
-              boricAcidNote = "<br>❖ Boric Acid with Ultra Low Sulphate adds USD 300/MT.";
+              boricAcidNote = "<br>❖ Boric Acid with Ultra Low Sulphate adds 300 USD/MT.";
             }
 
             const finalPrice = unitPriceValue + portAdditionalPrice + bagAdditionalPrice + boricAcidAdditionalPrice;
@@ -924,7 +924,7 @@
                     )}
                     <div className="mt-4 space-y-2">
                       <h3 className="text-base font-medium text-gray-700">Packaging Options</h3>
-                      <Tooltip text="Adds USD 15 per metric ton to the unit price">
+                      <Tooltip text="Adds 15 USD per metric ton to the unit price">
                         <label className="flex items-center text-sm text-gray-600">
                           <input
                             type="checkbox"
@@ -935,7 +935,7 @@
                           Small bags - 20kg/25kg FFS/Laminated PP (USD 15/MT additional)
                         </label>
                       </Tooltip>
-                      <Tooltip text="Adds USD 25 per metric ton to the unit price">
+                      <Tooltip text="Adds 25 USD per metric ton to the unit price">
                         <label className="flex items-center text-sm text-gray-600">
                           <input
                             type="checkbox"
@@ -953,7 +953,7 @@
                         </div>
                       )}
                       <h3 className="text-base font-medium text-gray-700 mt-4">Boric Acid Options</h3>
-                      <Tooltip text="Adds USD 20 per metric ton to the unit price">
+                      <Tooltip text="Adds 20 USD per metric ton to the unit price">
                         <label className="flex items-center text-sm text-gray-600">
                           <input
                             type="checkbox"
@@ -964,7 +964,7 @@
                           Boric Acid with Low Sulphate (USD 20/MT additional)
                         </label>
                       </Tooltip>
-                      <Tooltip text="Adds USD 300 per metric ton to the unit price">
+                      <Tooltip text="Adds 300 USD per metric ton to the unit price">
                         <label className="flex items-center text-sm text-gray-600">
                           <input
                             type="checkbox"
