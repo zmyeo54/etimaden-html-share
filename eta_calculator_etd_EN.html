@@ -639,7 +639,7 @@
 
           if (calculatedEtd < earliestEtd) {
             const earliestEta = addDays(earliestEtd, transitTime);
-            reviseETAMessage = `<strong class='blink' style='color: red; font-size: 18px'>We cannot process the order</strong><br><br>The Estimated Date of Departure (ETD) must be at least 20 days from today, which is on or after <strong style='color: green'>${formatDate(earliestEtd)}</strong>. With the current Required Date of Arrival (ETA), the calculated ETD is <strong style='color: orange'>${formatDate(calculatedEtd)}</strong>. We recommend adjusting to the earliest feasible ETA of <strong style='color: purple'>${formatDate(earliestEta)}</strong>.`;
+            reviseETAMessage = `<strong class='blink' style='color: red; font-size: 22.5px'>We cannot process the order</strong><br><br>The Estimated Date of Departure (ETD) must be at least 20 days from today, which is on or after <strong style='color: green'>${formatDate(earliestEtd)}</strong>. With the current Required Date of Arrival (ETA), the calculated ETD is <strong style='color: orange'>${formatDate(calculatedEtd)}</strong>. We recommend adjusting to the earliest feasible ETA of <strong style='color: purple'>${formatDate(earliestEta)}</strong>.`;
             resultObj = { message: reviseETAMessage, summary: {}, notes: [] };
             if ((smallBags20kg || smallBagsKraft || boricAcidLowSulphate || boricAcidUltraLowSulphate) && !unitPrice) {
               resultObj.notes.push({ text: "❖ Unit price is required when a packing or boric acid option is selected.", id: 1 });
@@ -766,13 +766,13 @@
           {showWelcome && (
             <div className="modal">
               <div className="modal-content">
-                <h2 className="text-xl font-bold text-blue-900 mb-4">Welcome to the ETA Calculator</h2>
+                <h2 className="text-2xl font-bold text-blue-900 mb-4">Welcome to the ETA Calculator</h2>
                 <p className="text-gray-600 mb-6">We are pleased to welcome you to the ETA Calculator, a tool designed to determine the Estimated Date of Departure (ETD) based on the Required Date of Arrival (ETA), destination country, port of discharge, and optional pricing details. This application ensures accurate scheduling and cost estimation for your shipments.</p>
                 <button
                   onClick={() => setShowWelcome(false)}
-                  className="bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
+                  className="bg-green-600 text-white font-semibold py-3 px-6 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
                 >
-                  Let's Go
+                  Get Started
                 </button>
               </div>
             </div>
@@ -1061,11 +1061,11 @@
                           </div>
                           <div className="summary-item">
                             <span className="summary-label">Bag Additional Price:</span>
-                            <span className="summary-value">{result.summary.bagAdditionalPrice || 'USD 0 USD/MT'}</span>
+                            <span className="summary-value">{result.summary.bagAdditionalPrice || '0 USD/MT'}</span>
                           </div>
                           <div className="summary-item">
                             <span className="summary-label">Boric Acid Additional Price:</span>
-                            <span className="summary-value">{result.summary.boricAcidAdditionalPrice || 'USD 0 USD/MT'}</span>
+                            <span className="summary-value">{result.summary.boricAcidAdditionalPrice || '0 USD/MT'}</span>
                           </div>
                           <div className="summary-item">
                             <span className="summary-label">Final Price:</span>
