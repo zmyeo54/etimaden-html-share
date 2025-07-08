@@ -436,7 +436,11 @@
       React.useEffect(() => {
         const saved = localStorage.getItem('recentCalculationsETA');
         if (saved) {
-          setRecentCalculations(JSON.parse(saved));
+          try {
+            setRecentCalculations(JSON.parse(saved));
+          } catch (e) {
+            console.error('Failed to parse recentCalculationsETA:', e);
+          }
         }
       }, []);
 
@@ -769,7 +773,7 @@
       };
 
       const copyResult = () => {
-        if (result) {
+        if (result && result.message && result.summary) {
           const summaryText = Object.entries(result.summary)
             .filter(([key, value]) => value !== null)
             .map(([key, value]) => {
@@ -814,7 +818,7 @@
           <div className="app-container bg-white shadow-lg rounded-lg">
             <div className="p-8 relative">
               <div className="absolute top-2 left-4 text-sm text-gray-600 font-medium" style={{ color: '#1E3A8A' }}>
-                10:05:00 AM | Tuesday, July 08, 2025 | GMT+08
+                {formatTimeWithSeconds(currentTime)} | {formatFullDateTime(currentTime).split(' at ')[0]} | HKT
               </div>
               <div className="flex flex-col items-center mb-8">
                 <img 
