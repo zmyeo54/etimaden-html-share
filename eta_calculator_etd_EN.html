@@ -399,7 +399,7 @@
     );
 
     const ETACalculator = () => {
-      const today = new Date('2025-07-08T10:05:00+08:00');
+      const today = new Date('2025-07-18T15:30:00+08:00');
       const defaultEtaDate = new Date(today);
       defaultEtaDate.setDate(today.getDate() + 80);
       const [eta, setEta] = React.useState(defaultEtaDate.toISOString().split('T')[0]);
@@ -424,6 +424,7 @@
       const [isLoading, setIsLoading] = React.useState(false);
       const [recentCalculations, setRecentCalculations] = React.useState([]);
       const [currentTime, setCurrentTime] = React.useState(today);
+      const [showWelcome, setShowWelcome] = React.useState(true);
       const etaInputRef = React.useRef(null);
 
       React.useEffect(() => {
@@ -449,8 +450,6 @@
           etaInputRef.current?.focus();
         }
       }, [showWelcome]);
-
-      const [showWelcome, setShowWelcome] = React.useState(true);
 
       const uniqueCountries = [...new Set(portsData.map(p => p.country))].sort();
       const regions = ["North", "South"];
@@ -667,7 +666,7 @@
           const preparationTime = 20;
           const etaDate = new Date(eta);
           etaDate.setHours(0, 0, 0, 0);
-          const todayDate = new Date('2025-07-08T10:05:00+08:00');
+          const todayDate = new Date('2025-07-18T15:30:00+08:00');
           todayDate.setHours(0, 0, 0, 0);
           const calculatedEtd = subtractDays(etaDate, transitTime);
           const earliestEtd = addDays(todayDate, preparationTime);
@@ -677,7 +676,7 @@
 
           if (calculatedEtd < earliestEtd) {
             const earliestEta = addDays(earliestEtd, transitTime);
-            reviseETAMessage = `<strong class='blink' style='color: red; font-size: 22.5px'>We cannot process the order</strong><br><br>The Estimated Date of Departure (ETD) must be at least 20 days from today, which is on or after <strong style='color: green'>${formatDate(earliestEtd)}</strong>. With the current Required Date of Arrival (ETA), the calculated ETD is <strong style='color: orange'>${formatDate(calculatedEtd)}</strong>. We recommend adjusting to the earliest feasible ETA of <strong style='color: purple'>${formatDate(earliestEta)}</strong>.`;
+            reviseETAMessage = `<span class='blink'><b>We cannot process the order.</b></span><br><br>The Estimated Date of Departure (ETD) must be at least 20 days from today, which is on or after <strong style='color: orange'>${formatDate(earliestEtd)}</strong>. With the current Required Date of Arrival (ETA), the calculated ETD is <strong style='color: green'>${formatDate(calculatedEtd)}</strong>. We recommend adjusting to the earliest feasible ETA of <strong style='color: purple'>${formatDate(earliestEta)}</strong>.`;
             resultObj = { message: reviseETAMessage, summary: {}, notes: [] };
             if ((smallBags20kg || smallBagsKraft || boricAcidLowSulphate || boricAcidUltraLowSulphate) && !unitPrice) {
               resultObj.notes.push({ text: "❖ Unit price is required when a packing or boric acid option is selected.", id: 1 });
