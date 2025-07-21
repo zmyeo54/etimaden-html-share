@@ -478,7 +478,8 @@
       };
 
       const handleSetToday = () => {
-        setEta(today.toISOString().split('T')[0]);
+        const todayDate = currentTime instanceof Date && !isNaN(currentTime) ? currentTime : new Date();
+        setEta(todayDate.toISOString().split('T')[0]);
         setResult(null);
         clearErrors();
       };
