@@ -336,6 +336,7 @@
     };
 
     const formatDate = (date) => {
+      if (!(date instanceof Date) || isNaN(date)) return "Invalid Date";
       return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     };
 
@@ -423,7 +424,7 @@
       });
       const [isLoading, setIsLoading] = React.useState(false);
       const [recentCalculations, setRecentCalculations] = React.useState([]);
-      const [currentTime, setCurrentTime] = React.useState(today);
+      const [currentTime, setCurrentTime] = React.useState(new Date());
       const [showWelcome, setShowWelcome] = React.useState(true);
       const etaInputRef = React.useRef(null);
 
@@ -659,15 +660,23 @@
 
           if (!selectedPort) {
             setIsLoading(false);
+            setResult({ message: "Invalid port selection. Please try again.", summary: {}, notes: [] });
             return;
           }
 
+          const etaDate = new Date(eta);
+          if (isNaN(etaDate)) {
+            setErrors({ ...newErrors, eta: "Invalid date format" });
+            setIsLoading(false);
+            return;
+          }
+          etaDate.setHours(0, 0, 0, 0);
+
+          const todayDate = currentTime instanceof Date && !isNaN(currentTime) ? new Date(currentTime) : new Date();
+          todayDate.setHours(0, 0, 0, 0);
+
           const transitTime = selectedPort.transitTime;
           const preparationTime = 20;
-          const etaDate = new Date(eta);
-          etaDate.setHours(0, 0, 0, 0);
-          const todayDate = new Date('2025-07-18T15:30:00+08:00');
-          todayDate.setHours(0, 0, 0, 0);
           const calculatedEtd = subtractDays(etaDate, transitTime);
           const earliestEtd = addDays(todayDate, preparationTime);
 
